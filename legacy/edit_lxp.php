@@ -128,7 +128,7 @@
 		   }else $rel++;
 			if($pval==100 && $rel==4) $var=time();
 		   echo "[$i (+$rel)] &nbsp;<input type=\"text\" name=\"z$i\" value=\"$var\"";
-		   if($beschr[$rel]{0}=='*') echo " readonly"; // disabled: NOT incl. with form!
+		   if($beschr[$rel][0]=='*') echo " readonly"; // disabled: NOT incl. with form!
 		   echo ">";
 		   echo " '",$beschr[$rel]."'";
 		   echo "<br>\n";
@@ -138,4 +138,3 @@
 		echo "<input type=\"hidden\" name=\"lines\" value=\"$cnt\" >\n";
 		echo "<button type=\"submit\">OK and WriteBack</button></form></body></html>\n";
 	}
-?>
