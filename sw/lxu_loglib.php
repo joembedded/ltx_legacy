@@ -1,5 +1,5 @@
 <?php
-// FILE: lxu_loglib.php  - Version:20.09.2020
+// FILE: lxu_loglib.php  - Version:08.12.2020
 // include-module logfile only for LXU modules (path on 1.st level)!
 
 // ---- basic directory service ---
@@ -12,11 +12,13 @@ function check_dirs()
 	// Data and LOG always required
 	if (!file_exists($sdata)) mkdir($sdata);  // MainDirectory
 	if (!file_exists($sdata . "/log")) mkdir($sdata . "/log");  // Logfiles
+	if(strlen($mac)!==16) return;	// No MAC
+
 	if (!file_exists($sdata . "/$mac")) {
 		// if(!$dbg) return -1;	// --- Without debug: dir must exist
 		mkdir($sdata . "/$mac");
 		file_put_contents($sdata . "/$mac/date0.dat", time()); // Note initial date
-		file_put_contents($sdata . "/$mac/quota_days.dat", "90\n1000"); // Number of Days or Lines by default
+		file_put_contents($sdata . "/$mac/quota_days.dat", DB_QUOTA); 
 		$newdev = true;
 	}
 	if (!file_exists($sdata . "/$mac/cmd")) {
