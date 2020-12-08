@@ -7,7 +7,7 @@ LTX can be installed WITH (named as "LTX_server") Database and WITHOUT (named as
 
 In case of "LTX_legacy" all data will be sent to directories and ALL device's new data will
 be added to a file ".../out_total/total.edt" for the device. 
-This file is simple text ('EDT'-Format) and might become quite large over time ;-)
+This file is simple text ('EDT'-Format) and might become quite large oer time ;-)
 The input script 'sw\ltu_trigger.php' will add the data.
 
 _(Just as Info: In case of "LTX_server" all new data will be written to the database. There is a quota limit in
