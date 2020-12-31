@@ -4,7 +4,7 @@
 // Factory-key ist stored as php definition to prevent external access
 // Firmeware-File either per POST or viaURL_parameter (if already somewhere in the local Filesystem)
 
-// V1.1 2020(C) JoEmbedded 
+// V1.2 2020(C) JoEmbedded 
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -113,84 +113,93 @@ if ($dbg) echo "Loaded File:'$freal_name' Size:$fsize\n";
 
 $fw_bin = file_get_contents($fname);
 
-$magic = substr($fw_bin, 0, 4);
-if ($dbg) {
-	show_str("Found Magic:", $magic);
-	show_str("Soll Magic:", HDR0_MAGIC);
-}
-if ($magic != HDR0_MAGIC) { // String Compare!
-	exit_error("File is either no firmware file or corrupt! (HDR0)");
-}
-
-$hdrlen = u32l_str(substr($fw_bin, 4, 4));
-$binlen = u32l_str(substr($fw_bin, 8, 4));
-if ($dbg) echo "Hdrlen:$hdrlen, Binlen:$binlen\n";
-
-if (($hdrlen + $binlen) != $fsize) {
-	exit_error("File is either no firmware file or corrupt! (Filesize)");
-}
-
-// CRC-check
-$sollcrc = substr($fw_bin, 16, 4);
-
-$istcrc = str_u32l(~crc32(substr($fw_bin, $hdrlen, $binlen)));
-if ($dbg) {
-	show_str("SollCRC32:", $sollcrc);
-	show_str("istCRC32:", $istcrc);
-}
-
-if ($sollcrc != $istcrc) { // String Compare!
-	exit_error("File is either no firmware file or corrupt! (CRC32)");
-}
-
-$cookie = u32l_str(substr($fw_bin, 20, 4));
-$cookie_str = gmdate("d.m.Y H:i:s", $cookie);
-$xlog .= "(Date:'$cookie_str'(UTC))";
-
-echo "Firmware dated '$cookie_str' (UTC)\n";
-echo "Loaded Firmware '$freal_name': Size $fsize Bytes\n";
-echo "for MAC: $mac\n";
-
-
 $dpath = S_DATA . "/$mac/cmd/";
-$sec_key = "";	// Assume empty.. Later maybe user's key..
 
-@include("$dpath/def_factory_key.php"); // If available: Use it
-if (defined("FW_FACTORY_KEY")) {
-	$sec_key = pack("H*", FW_FACTORY_KEY);	// If there is a key, use it
+if(substr($freal_name,-4) === '.sec' ){
+	if((strlen($fw_bin)%16)){
+		exit_error("File is either no firmware file or corrupt! (SIZE)");
+	}
+	$fw_sec = $fw_bin;
+	$cookie = $now;
+}else{
 
+	$magic = substr($fw_bin, 0, 4);
+	if ($dbg) {
+		show_str("Found Magic:", $magic);
+		show_str("Soll Magic:", HDR0_MAGIC);
+	}
+	if ($magic != HDR0_MAGIC) { // String Compare!
+		exit_error("File is either no firmware file or corrupt! (HDR0)");
+	}
+
+	$hdrlen = u32l_str(substr($fw_bin, 4, 4));
+	$binlen = u32l_str(substr($fw_bin, 8, 4));
+	if ($dbg) echo "Hdrlen:$hdrlen, Binlen:$binlen\n";
+
+	if (($hdrlen + $binlen) != $fsize) {
+		exit_error("File is either no firmware file or corrupt! (Filesize)");
+	}
+
+	// CRC-check
+	$sollcrc = substr($fw_bin, 16, 4);
+
+	$istcrc = str_u32l(~crc32(substr($fw_bin, $hdrlen, $binlen)));
+	if ($dbg) {
+		show_str("SollCRC32:", $sollcrc);
+		show_str("istCRC32:", $istcrc);
+	}
+
+	if ($sollcrc != $istcrc) { // String Compare!
+		exit_error("File is either no firmware file or corrupt! (CRC32)");
+	}
+
+	$cookie = u32l_str(substr($fw_bin, 20, 4));
+	$cookie_str = gmdate("d.m.Y H:i:s", $cookie);
+	$xlog .= "(Date:'$cookie_str'(UTC))";
+
+	echo "Firmware dated '$cookie_str' (UTC)\n";
+	echo "Loaded Firmware '$freal_name': Size $fsize Bytes\n";
+	echo "for MAC: $mac\n";
+
+	$sec_key = "";	// Assume empty.. Later maybe user's key..
+
+	@include("$dpath/def_factory_key.php"); // If available: Use it
+	if (defined("FW_FACTORY_KEY")) {
+		$sec_key = pack("H*", FW_FACTORY_KEY);	// If there is a key, use it
+
+	}
+
+	if (strlen($sec_key) != 16) { // Condition for AES128-Key
+		echo "No Factory Key file found, generating...\n";
+		$xlog .= "(Get Factory Key...)";
+		$sec_key = get_factory_key();
+
+		$of = fopen($dpath . 'def_factory_key.php', 'w');	// Cache Factory Key
+		fwrite($of, "<?php\n define(\"FW_FACTORY_KEY\",\"" . implode(unpack("H*", $sec_key)) . "\");\n?>\n");
+		fclose($of);
+	} else {
+		$xlog .= "(Factory Key already stored)";
+		echo "Factory Key already stored\n";
+	}
+
+	if (strlen($sec_key) != 16) {
+		exit_error("Illegal Key len:" . strlen($sec_key) . "(must be 16)");
+	}
+
+	echo "Using Key: '" . implode(unpack("H*", $sec_key)) . "'\n";
+
+	// Padd
+	while (strlen($fw_bin) % 16) $fw_bin .= "\0";
+
+	// Encrypting firmware
+	$iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+	$fw_sec = openssl_encrypt($fw_bin, "aes-128-cbc", $sec_key,  OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+
+	//--- todo: Lock files before modifying.
+	@unlink($dpath . '_firmware.sec.umeta');	// Kill Meta-infos
+
+	echo "Writing encrypted firmware '_firmware.sec'\n";
 }
-
-if (strlen($sec_key) != 16) { // Condition for AES128-Key
-	echo "No Factory Key file found, generating...\n";
-	$xlog .= "(Get Factory Key...)";
-	$sec_key = get_factory_key();
-
-	$of = fopen($dpath . 'def_factory_key.php', 'w');	// Cache Factory Key
-	fwrite($of, "<?php\n define(\"FW_FACTORY_KEY\",\"" . implode(unpack("H*", $sec_key)) . "\");\n?>\n");
-	fclose($of);
-} else {
-	$xlog .= "(Factory Key already stored)";
-	echo "Factory Key already stored\n";
-}
-
-if (strlen($sec_key) != 16) {
-	exit_error("Illegal Key len:" . strlen($sec_key) . "(must be 16)");
-}
-
-echo "Using Key: '" . implode(unpack("H*", $sec_key)) . "'\n";
-
-// Padd
-while (strlen($fw_bin) % 16) $fw_bin .= "\0";
-
-// Encrypting firmware
-$iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-$fw_sec = openssl_encrypt($fw_bin, "aes-128-cbc", $sec_key,  OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-
-//--- todo: Lock files before modifying.
-@unlink($dpath . '_firmware.sec.umeta');	// Kill Meta-infos
-
-echo "Writing encrypted firmware '_firmware.sec'\n";
 $of = fopen($dpath . '_firmware.sec', 'wb');
 fwrite($of, $fw_sec);
 fclose($of);

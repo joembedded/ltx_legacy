@@ -32,6 +32,8 @@ if (!$dev) {
 	{
 		global $mac, $xlog;
 
+		if(!strlen(KEY_API_GL) || !strlen(KEY_SERVER_URL)) return "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+
 		$api_key = KEY_API_GL; // Needs no Token
 		$getfsec_url = KEY_SERVER_URL;
 
@@ -66,30 +68,36 @@ if (!$dev) {
 	$dpath =	$dpath = S_DATA . "/$mac/cmd/";
 	$xlog = "";
 
-	@include("$dpath/def_factory_key.php"); // If available: Use it
-	if (defined("FW_FACTORY_KEY")) {
-		echo "Factory Key found: " . FW_FACTORY_KEY . "<br><br>";
-	} else {
-		if (strlen(KEY_API_GL)) {
-			echo "No Factory Key found, generating...\n";
-			$xlog .= "(Get Factory Key...)";
-			$sec_key = get_factory_key();
-			if (strlen($sec_key) != 16) {
-				exit_error("Illegal Key len:" . strlen($sec_key) . "(must be 16)");
+
+	if( strlen(KEY_API_GL) && strlen(KEY_SERVER_URL) ){
+
+		@include("$dpath/def_factory_key.php"); // If available: Use it
+		if (defined("FW_FACTORY_KEY")) {
+			echo "Factory Key found: " . FW_FACTORY_KEY . "<br><br>";
+		} else {
+			if (strlen(KEY_API_GL)) {
+				echo "No Factory Key found, generating...\n";
+				$xlog .= "(Get Factory Key...)";
+				$sec_key = get_factory_key();
+				if (strlen($sec_key) != 16) {
+					exit_error("Illegal Key len:" . strlen($sec_key) . "(must be 16)");
+				}
+				$of = fopen($dpath . 'def_factory_key.php', 'w');	// Cache Factory Key
+				fwrite($of, "<?php\n define(\"FW_FACTORY_KEY\",\"" . implode(unpack("H*", $sec_key)) . "\");\n?>\n");
+				fclose($of);
+				echo "Factory Key generated: " . implode(unpack("H*", $sec_key)) . "<br><br>";
 			}
-			$of = fopen($dpath . 'def_factory_key.php', 'w');	// Cache Factory Key
-			fwrite($of, "<?php\n define(\"FW_FACTORY_KEY\",\"" . implode(unpack("H*", $sec_key)) . "\");\n?>\n");
-			fclose($of);
-			echo "Factory Key generated: " . implode(unpack("H*", $sec_key)) . "<br><br>";
+
+			echo "Owner Token or Key (only needed once for first Upload):";
+			echo "<input type='text' name ='token'><br>";
 		}
-
-		echo "Owner Token or Key (only needed once for first Upload):";
-		echo "<input type='text' name ='token'><br>";
+		if (strlen($xlog)) add_logfile(); // Regular exit
+		echo "Firmware File (*.bin, *.sec):";
+	}else{
+		echo "Firmware File (*.sec):";
 	}
-	if (strlen($xlog)) add_logfile(); // Regular exit
-	?>
+?>
 
-	Firmware File (*.bin):
 	<input type="file" name="X"><br><br>
 	<input type="Submit" name="UP"> <input type="reset" name="Reset">
 	</form>

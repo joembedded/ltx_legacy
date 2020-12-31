@@ -90,8 +90,13 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	//--- Show avilabale infos ---
 	echo "</p><p><b>Device Info:</b><br>";
 
-	$user_info = @file("$dpath/user_info.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+	echo "Name: ";
+	$iparam_info =  @file(S_DATA . "/$dpath/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
+	if (@$iparam_info[5]) echo "'<b>".htmlspecialchars($iparam_info[5])."</b>'";
+	else echo "(NO 'iparam.lxp')";
+	echo "<br>";
 
+	$user_info = @file("$dpath/user_info.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 	if (@$user_info[0]) echo "Legacy Name: '<b>" . htmlspecialchars($user_info[0]) . "</b>'";
 	else echo "Legacy Name: (NOT SET)";
 	if (!$demo) echo " <a href=\"edit_userinfoname.php?s=$mac\">[Edit Legacy Name ('user_info.dat')]</a>";
@@ -428,7 +433,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	if (!$demo) {
 
 		echo "</p><p><b>Manage:</b><br>";
-		if (strlen(KEY_API_GL)) {
+		if(defined('KEY_API_GL') && defined('KEY_SERVER_URL')){
 			echo "<a target='_blank' href='gen_key_badge.php?s=$mac'>Generate Key Badge</a><br><br>";
 		}
 
@@ -481,9 +486,8 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			echo "Old Info (Warnings/Errors/Alarms) '_info_wea_old.txt' (not found)<br>";
 		}
 
-		if (strlen(KEY_API)) {
-			echo "<br><a href=\"fw_upload_form.php?s=$mac\">Upload new Firmware File</a><br>";
-		}
+		echo "<br><a href=\"fw_upload_form.php?s=$mac\">Upload new Firmware File</a><br>";
+
 		if (!empty($fwinfo['cookie'])) echo "<a href=\"unlink_lx.php?s=$mac&f=cmd/_firmware.sec.umeta\">Delete Firmware File</a><br>"; // Attention, not safe
 		echo "<br><a href=\"files_upload_form.php?s=$mac\">Upload Files to Device's Filesystem</a><br>";
 

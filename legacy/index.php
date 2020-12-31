@@ -21,8 +21,8 @@ if (!strcmp($api_key, L_KEY)) {
 }
 echo "<!DOCTYPE HTML><html><head>";
 
-if ($dev) $title = "Legacy LTrax Server Develop-Login V0.13";
-else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.13";
+if ($dev) $title = "Legacy LTrax Server Develop-Login V0.14";
+else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.14";
 
 $self = $_SERVER['PHP_SELF']; // Periodisch alle 30 Sekunden  auffrischen
 echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
@@ -116,8 +116,16 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 		// Link to this device
 		echo "<a href=\"device_lx.php?s=$file\">$file</a>";
 
+		echo " (Name: ";
+		$iparam_info =  @file(S_DATA . "/$file/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
+		if (@$iparam_info[5]) echo "'<b>".htmlspecialchars($iparam_info[5])."</b>'";
+		else echo "(NO 'iparam.lxp')";
+		echo " , Legacy Name: ";
 		$user_info = @file(S_DATA . "/$file/user_info.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-		if (@$user_info[0]) echo " (Legacy Name: '<b>" . htmlspecialchars($user_info[0]) . "</b>')";
+		if (@$user_info[0]) echo "'<b>".htmlspecialchars($user_info[0])."</b>'";
+		else echo '(NOT SET)';
+		echo ")";
+
 
 		echo " Last Contact: $fage";
 		if ($dev && @file_exists(S_DATA . "/$file/cmd/dbg.cmd")) {
