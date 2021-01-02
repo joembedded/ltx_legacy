@@ -433,7 +433,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	if (!$demo) {
 
 		echo "</p><p><b>Manage:</b><br>";
-		if(defined('KEY_API_GL') && defined('KEY_SERVER_URL')){
+		if(strlen(KEY_API_GL) && strlen(KEY_SERVER_URL)){
 			echo "<a target='_blank' href='gen_key_badge.php?s=$mac'>Generate Key Badge</a><br><br>";
 		}
 
