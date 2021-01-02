@@ -6,7 +6,7 @@
 	// *** Change Directory for DATA and internal access key to prevent external call of scripts ***
 	define ("S_API_KEY","SintLTX"); 	// This the Server's Internal-API_KEY (for triggers, auto-cleanup,..) (keep secret!!!)
 	define ("S_DATA","../data_secret");	// Server's data directory (could be secret or (later) dynamic (e.g. from database)
-	define ("DB_QUOTA","90\n1000"); // Default Quota for new Devices (if Database is used: 'Days\nLines')
+	define ("DB_QUOTA","3650\n100000000"); // Default Quota for new Devices (if Database is used: 'Days\nLines')
 	define ("L_KEY","LegacyLTX");	// legacyKey for ***LEGACY Login***
 	// Optionally (if GPS_VIEW used):
 	define ("MAPKEY","pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw"); // Key for MAPBOX.COM Mapserver, Request an OWN one if necessary!
