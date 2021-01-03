@@ -1,5 +1,5 @@
 <?php
-// FILE: lxu_loglib.php  - Version:08.12.2020
+// FILE: lxu_loglib.php  - Version:02.01.2021
 // include-module logfile only for LXU modules (path on 1.st level)!
 
 // ---- basic directory service ---
@@ -66,8 +66,6 @@ function exit_error($err)
 // ------ Write LogFile (carefully) -------- (similar to lxu_xxx.php)
 function add_logfile()
 {
-	global $xlog, $dbg, $mac, $now;
-
 	$sdata = S_DATA;
 	$logpath = $sdata . "/log/";
 	if (@filesize($logpath . "log.txt") > 100000) {	// Main LOG
@@ -75,17 +73,8 @@ function add_logfile()
 		rename($logpath . "log.txt", $logpath . "_log_old.txt");
 		$xlog .= " (Main 'log.txt' -> '_log_old.txt')";
 	}
-	$logpath = $sdata . "/$mac/";
-	if (@filesize($logpath . "log.txt") > 50000) {	// Device LOG
-		@unlink($logpath . "_log_old.txt");
-		rename($logpath . "log.txt", $logpath . "_log_old.txt");
-		//$xlog.=" (Device 'log.txt' -> '_log_old.txt')";
-
-		if (@filesize($logpath . "conn_log.txt") > 50000) {	// Connection Log
-			@unlink($logpath . "_conn_log_old.txt");
-			rename($logpath . "conn_log.txt", $logpath . "_conn_log_old.txt");
-			//$xlog.=" (Connections 'log.txt' -> '_log_old.txt')";
-		}
+	
+	if(strlen($mac)){
 	}
 
 	if ($dbg) $xlog .= "(DBG:$dbg)";
@@ -101,6 +90,19 @@ function add_logfile()
 	}
 	// User Logfile - Text
 	if (strlen($mac) == 16 && file_exists($sdata . "/$mac")) {
+		$logpath = $sdata . "/$mac/";
+		if (@filesize($logpath . "log.txt") > 50000) {	// Device LOG
+			@unlink($logpath . "_log_old.txt");
+			rename($logpath . "log.txt", $logpath . "_log_old.txt");
+			//$xlog.=" (Device 'log.txt' -> '_log_old.txt')";
+
+			if (@filesize($logpath . "conn_log.txt") > 50000) {	// Connection Log
+				@unlink($logpath . "_conn_log_old.txt");
+				rename($logpath . "conn_log.txt", $logpath . "_conn_log_old.txt");
+				//$xlog.=" (Connections 'log.txt' -> '_log_old.txt')";
+			}
+		}
+
 		$log = fopen($sdata . "/$mac/log.txt", 'a');
 		if (!$log) return;
 		while (!flock($log, LOCK_EX)) usleep(10000);  // Lock File - Is a MUST
