@@ -1,5 +1,5 @@
 <?php
-// FILE: lxu_loglib.php  - Version:02.01.2021
+// FILE: lxu_loglib.php  - Version:10.01.2021
 // include-module logfile only for LXU modules (path on 1.st level)!
 
 // ---- basic directory service ---
@@ -66,15 +66,14 @@ function exit_error($err)
 // ------ Write LogFile (carefully) -------- (similar to lxu_xxx.php)
 function add_logfile()
 {
+	global $xlog, $dbg, $mac, $now;
+
 	$sdata = S_DATA;
 	$logpath = $sdata . "/log/";
 	if (@filesize($logpath . "log.txt") > 100000) {	// Main LOG
 		@unlink($logpath . "_log_old.txt");
 		rename($logpath . "log.txt", $logpath . "_log_old.txt");
 		$xlog .= " (Main 'log.txt' -> '_log_old.txt')";
-	}
-	
-	if(strlen($mac)){
 	}
 
 	if ($dbg) $xlog .= "(DBG:$dbg)";
