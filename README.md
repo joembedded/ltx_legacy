@@ -19,7 +19,7 @@ The input script '../sw/ltu_trigger.php' will add the data (feel free to modify 
 
  3. Set your Server name and path in the 'sys_param.lxp' file on the device. 
 
- 4. Make a test transmition
+ 4. Make a test transmission
 
 
 _(Just as Info: In case of "LTX_server" all new data will be written to the database. There is a quota limit in
