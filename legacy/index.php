@@ -40,7 +40,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	// dev.php DevPortal Script for LTrax. Details: see docu
 	// Only for Low-Level Developer Access!!!
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// V1.10 / 20.11.2020
+	// V1.20 / 22.01.2021
 	// todo: --- maybe LOCK makes sense for several files
 	// --- ensure user access (e.g. via keys)
 
@@ -58,7 +58,6 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	//echo "<a href=\"..\sw\index.php\">LTrax Home</a><br>";
 	//echo "<a href=\"..\media\index.php\">LTrax Media Browser</a><br>";
 	echo "</p>";
-
 	$dbg = 0;	// No Debug enabled
 
 	$now = time();						// one timestamp for complete run
