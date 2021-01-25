@@ -152,14 +152,14 @@ if (!file_exists(S_DATA . "/$mac") || check_dirs()) exit_error("Error (Directory
 	$res .= chr(($crc >> 8) & 255) . chr($xc);
 	$ticket = strtoupper(implode("",unpack("H*", $res)));	// String 2 Hex-String, reverse: pack("H*", $hex);
 
-	// Pin: get a 6-digit PIN 100100-999899 out of MAC
-	$pin=((((~crc32(pack("V*",hexdec(substr($mac,0,8)),hexdec(substr($mac,8,8))))) & 0xFFFFFFFF))%899800)+100100;	
-
 	$anz = 1;	// Number of Badges
 	echo "<br><br><hr><br>";
 
 	$ownertoken = substr($fw_key, 0, 16);
 	$qrtxt = "MAC:$mac OT:$ownertoken";
+	// Pin: get a 6-digit PIN 100100-999899 out of fw_key
+	$pin=(hexdec(substr($fw_key, 0, 8))  % 899800)+100100;
+
 	$qrlink = "../sw/php_qr/ltx_qr.php?text=" . urlencode($qrtxt) . "&px=3&fx=1";
 	for ($i = 0; $i < $anz; $i++) {
 		echo "<table>";
