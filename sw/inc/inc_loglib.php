@@ -20,6 +20,7 @@ function add_logfile()
 
 	$sdata = "../" . S_DATA;
 	$logpath = $sdata . "/$mac/";
+
 	if (@filesize($logpath . "log.txt") > 50000) {	// Device LOG
 		@unlink($logpath . "_log_old.txt");
 		rename($logpath . "log.txt", $logpath . "_log_old.txt");
@@ -27,7 +28,6 @@ function add_logfile()
 	}
 
 	if ($dbg) $xlog .= "(DBG:$dbg)";
-
 	// User Logfile - Text
 	if (strlen($mac) == 16 && file_exists($sdata . "/$mac")) {
 		$log = fopen($sdata . "/$mac/log.txt", 'a');
