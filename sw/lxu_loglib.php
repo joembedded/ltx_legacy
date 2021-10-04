@@ -57,7 +57,7 @@ function check_dirs()
 function exit_error($err)
 {
 	global $xlog;
-	echo "ERROR: '$err'\n";
+	echo "ERROR: '$err'\n\xFF:ServExitError*";
 	$xlog .= "(ERROR:'$err')";
 	add_logfile();
 	exit();
