@@ -147,7 +147,9 @@ if (!$dbg && strcmp($api_key, D_API_KEY)) {
 	exit_error("API Key");
 }
 
-if (empty($fname)) exit_error("No Data");
+if (empty($fname)) {
+	exit_error("No Data");
+}
 
 if (check_dirs()) exit_error("Error (Directory/MAC not found)");
 
@@ -156,7 +158,7 @@ $data = file_get_contents($fname);
 $maxlen = strlen($data);
 if ($maxlen < 16) exit_error("Empty Data");	// 16 is minimum
 if ($dbg) {	// log all incomming data local and also txt
-	$of = fopen(S_DATA . "/$mac/dbg/_$dfn.dat", 'wb'); // first save data
+	$of = fopen(S_DATA . "/$mac/dbg/$dfn.dat", 'wb'); // first save data
 	fwrite($of, $data);
 	fclose($of);
 	$of = fopen(S_DATA . "/$mac/dbg/$dfn.txt", 'w'); // then open txt
@@ -841,7 +843,7 @@ echo $ecmd;
 
 if ($dbg) {
 	if ($dbg > 1) show_str("ECMD: ", $ecmd);
-	$of2 = fopen(S_DATA . "/$mac/dbg/__$dfn.ecmd", 'wb'); // save response
+	$of2 = fopen(S_DATA . "/$mac/dbg/$dfn.ecmd", 'wb'); // save response
 	fwrite($of2, $ecmd);
 	fclose($of2);
 }
