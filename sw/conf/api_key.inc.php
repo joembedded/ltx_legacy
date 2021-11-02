@@ -18,8 +18,8 @@
 	define ("KEY_SERVER_URL","https://joembedded.de/x3/sec/maccheck.php");
 	
 	// A Public Geoserver from JoEmbedded with limited access (1000 calls/day) Free for use 
-	define ("G_API_KEY","Geo1310Jo"); // This the API_KEY to access the GeoApi (xxx)
-	define ("CELLOC_SERVER_URL","https://joembedded.de/x3/api/cellloc.php"); // Public implementation
+	define ("G_API_KEY","TESTTOKEN"); // This the API_KEY to access the GeoApi
+	define ("CELLOC_SERVER_URL","https://flexgate.org/ltx_api/gcells/gcells.php"); // Public implementation
 
 	// Only change with changes in the Firmware:
 	define ("D_API_KEY","LX1310"); // This the DEVICE-API_KEY to access the Server (used by Device's Firmware)
