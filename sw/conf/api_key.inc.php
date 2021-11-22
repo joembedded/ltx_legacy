@@ -3,9 +3,9 @@
 	// api_key.php - Include File, holding API-Keys. 'include'
 	// Key stored as defines to prevent access via webserver
 	
-	// *** Change Directory for DATA and internal access key to prevent external call of scripts ***
+	// *** Change Directory for S_DATA and internal access key to prevent external call of scripts!!! ***
 	define ("S_API_KEY","SintLTX"); 	// This the Server's Internal-API_KEY (for triggers, auto-cleanup,..) (keep secret!!!)
-	define ("S_DATA","../data_secret");	// Server's data directory (could be secret or (later) dynamic (e.g. from database)
+	define ("S_DATA","../data_secret");	// Server's ***SECRET*** data directory (could be secret or (later) dynamic (e.g. from database)
 	define ("DB_QUOTA","3650\n100000000"); // Default Quota for new Devices (if Database is used: 'Days\nLines')
 	define ("L_KEY","LegacyLTX");	// legacyKey for ***LEGACY Login***
 	// Optionally (if GPS_VIEW used):
