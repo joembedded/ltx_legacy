@@ -30,7 +30,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 20.11.2020
+	// Version: 28.11.2021
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
 	// todo: Cross-Site-Scripting irgendwo?
@@ -92,7 +92,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 
 	echo "Name: ";
 	$iparam_info =  @file(S_DATA . "/$dpath/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
-	if (@$iparam_info[5]) echo "'<b>".htmlspecialchars($iparam_info[5])."</b>'";
+	if (@isset($iparam_info[5])) echo "'<b>".htmlspecialchars($iparam_info[5])."</b>'";
 	else echo "(NO 'iparam.lxp')";
 	echo "<br>";
 
