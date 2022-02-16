@@ -1,13 +1,12 @@
 <?PHP
 // -------------------------------------------------------------------
 // view.php - Show data (filtered)
-// 01.3.2020 j.wickenh
+// 16.02.2022 j.wickenh
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
 
 // ---------------------------- M A I N --------------
-header('Content-Type: text/plain');
 $mac = $_GET["s"];
 $fname = $_GET["f"];
 
