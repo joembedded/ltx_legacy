@@ -6,22 +6,29 @@ __This is a reduced version of LTX Server, only using PHP and the Server's Files
 LTX can be installed WITH (named as "LTX_server") Database and WITHOUT (named as "LTX_legacy").
 
 In case of "LTX_legacy" all data will be sent to directories and ALL device's new data will
-be added to a file '.../out_total/total.edt' for the device.
-This file is simple text ('EDT'-Format) and might become quite large over time ;-)
+be added to a file '.../out_total/total.edt' for the device. This file is simple text ('EDT'-Format) 
+and might become quite large over time ;-)
+
+Some very simple scripts allow rudimentary access to all devices/loggers functions (as well as FOTA Updates)
+
 The input script '../sw/ltu_trigger.php' will add the data (feel free to modify it for your own requirements)
 
-**Important: This repository ('ltx_legacy') is automatically generated/mainatined by scripts! No Feedback to Request/Comments**
+## Important: This repository ('ltx_legacy') is automatically generated/maintained by scripts! No Feedback to Issues/Request/Comments ##
 
 ***Installation:*** 
 
- 1. Simply copy all to your server, Server must run HTTP (by default port 80). 
-... HTTPS will follow with the next release, but it is a good idea to make the Server reachable by HTTP and HTTPS with the same name.
+ 1. Simply copy all to your server, Server must run HTTP (by default port 80). It is a good idea to make the Server reachable by HTTP and HTTPS with the same name (see 5.).
+... (Data transfer via HTTP for (devices/loggers) takes much less energy than HTTPS (optionally on request devices can also use HTTP-VPN or HTTPS).
 
- 2. Modify './sw/conf/api_key.inc.php' as in comments
 
- 3. Set your Server name and path in the 'sys_param.lxp' file on the device. 
+ 2. Modify './sw/conf/api_key.inc.php' as in comments (at least set a 'secret' data directory 'S_DATA' and an own 'L_KEY')
+
+ 3. Set your Server name and path in the 'sys_param.lxp' file on the devices/loggers.
 
  4. Make a test transmission
+ 
+ 5. Log in to Legacy 'https://SERVER.XYZ/xxx/legacy/index.html'
+ ... (Hint: for fast access bookmark it like this: https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY)
 
 
 _(Just as Info: In case of "LTX_server" all new data will be written to the database. There is a quota limit in
@@ -37,4 +44,5 @@ The file 'quota_days.dat' my be set to individual values per logger at any time.
 - V1.00 04.12.2020 Initial
 - V1.01 06.12.2020 Checked for PHP8 compatibility
 - V1.10 09.01.2021 More Docs added
+- V1.11 16.03.2022 More Docs added
 
