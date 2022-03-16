@@ -39,7 +39,7 @@ Change e.g. to "90\n1000" to allow only the last 90 days or max. 1000 lines per 
 The file 'quota_days.dat' my be set to individual values per logger at any time. )_
 
 
-_(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Key for the device via external 'KEY_SERVER_URL' is requred)
+_(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Key for the device via external 'KEY_SERVER_URL' is requred)_
 
 ---
 
