@@ -9,7 +9,7 @@ In case of "LTX_legacy" all data will be sent to directories and ALL device's ne
 be added to a file '.../out_total/total.edt' for the device. This file is simple text ('EDT'-Format) 
 and might become quite large over time ;-)
 
-Some very simple scripts allow rudimentary access to all devices/loggers functions (as well as FOTA Updates)
+Some very simple scripts allow rudimentary access to all devices/loggers functions (as well as secure FOTA Updates and generating device Labels)
 
 The input script '../sw/ltu_trigger.php' will add the data (feel free to modify it for your own requirements)
 
@@ -18,7 +18,7 @@ The input script '../sw/ltu_trigger.php' will add the data (feel free to modify 
 ***Installation:*** 
 
  1. Simply copy all to your server, Server must run HTTP (by default port 80). It is a good idea to make the Server reachable by HTTP and HTTPS with the same name (see 5.).
-... (Data transfer via HTTP for (devices/loggers) takes much less energy than HTTPS (optionally on request devices can also use HTTP-VPN or HTTPS).
+ ... (Data transfer via HTTP for (devices/loggers) takes much less energy than HTTPS (optionally on request devices can also use HTTP-AES128-VPN or HTTPS).
 
 
  2. Modify './sw/conf/api_key.inc.php' as in comments (at least set a 'secret' data directory 'S_DATA' and an own 'L_KEY')
@@ -37,6 +37,9 @@ will automatically be written for each new logger, 1.st line are days (here 3650
 The input script 'sw\ltu_trigger.php' will automatically remove older data.
 Change e.g. to "90\n1000" to allow only the last 90 days or max. 1000 lines per device (so even a small DB can hold thousands of devices).
 The file 'quota_days.dat' my be set to individual values per logger at any time. )_
+
+
+_(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Key for the device via external 'KEY_SERVER_URL' is requred)
 
 ---
 
