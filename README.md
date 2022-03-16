@@ -18,7 +18,7 @@ The input script '../sw/ltu_trigger.php' will add the data (feel free to modify 
 ***Installation:*** 
 
  1. Simply copy all to your server, Server must run HTTP (by default port 80). It is a good idea to make the Server reachable by HTTP and HTTPS with the same name (see 5.).
- ... (Data transfer via HTTP for (devices/loggers) takes much less energy than HTTPS (optionally on request devices can also use HTTP-AES128-VPN or HTTPS).
+... (Data transfer via HTTP for (devices/loggers) takes much less energy than HTTPS (optionally on request devices can also use HTTP-AES128-VPN or HTTPS).
 
 
  2. Modify './sw/conf/api_key.inc.php' as in comments (at least set a 'secret' data directory 'S_DATA' and an own 'L_KEY')
@@ -28,7 +28,7 @@ The input script '../sw/ltu_trigger.php' will add the data (feel free to modify 
  4. Make a test transmission
  
  5. Log in to Legacy 'https://SERVER.XYZ/xxx/legacy/index.html'
- ... (Hint: for fast access bookmark it like this: https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY)
+... (Hint: for fast access bookmark it like this: https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY)
 
 
 _(Just as Info: In case of "LTX_server" all new data will be written to the database. There is a quota limit in
