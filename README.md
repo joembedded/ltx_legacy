@@ -10,6 +10,8 @@ be added to a file '.../out_total/total.edt' for the device.
 This file is simple text ('EDT'-Format) and might become quite large over time ;-)
 The input script '../sw/ltu_trigger.php' will add the data (feel free to modify it for your own requirements)
 
+**Important: This repository ('ltx_legacy') is automatically generated/mainatined by scripts! No Feedback to Request/Comments**
+
 ***Installation:*** 
 
  1. Simply copy all to your server, Server must run HTTP (by default port 80). 
