@@ -1,6 +1,6 @@
 <?php
 // mcu_xxx.php Server-Communication Script for LTrax. Details: see docu
-// (C) 20.09.2020 - V1.07 joembedded@gmail.com  - JoEmbedded.de
+// (C) 08.04.2020 - V1.08 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
 error_reporting(E_ALL);
@@ -73,7 +73,7 @@ function trigger($reason)
 	$tscript = substr($self, 0, $rpos) . "/lxu_trigger.php";
 	$arg = "k=" . S_API_KEY . "&r=$reason&s=$mac";	// Parameter: API-KEY, reason and MAC
 
-	// return;	// EIn-kommentieren um Trigger Script NICHT starten wenn ohne DB
+	// return;	// Ein-kommentieren um Trigger Script NICHT starten wenn ohne DB
 
 	// First check if Trigger is available
 	$xlog = "";
@@ -120,7 +120,6 @@ $dbg = 0; // Debug-Level if >0, see docu
 $fname = @$_FILES['X']['tmp_name'];   // all data is contained in file 'X' RAW MODE
 $api_key = @$_GET['k'];				// max. 41 Chars KEY
 $mac = @$_GET['s']; 					// exactly 16 Zeichen. api_key and mac identify device
-$sec_id = @$_GET['c'];				// 0: No Encryption, 1: Encryption
 $now = time();						// one timestamp for complete run
 $mtmain_t0 = microtime(true);         // for Benchmark 
 $dfn = gmdate("Ymd_His", $now);		// 'disk_filename_from_now' (sortable)
@@ -130,12 +129,6 @@ $send_cmd = -1;						// If set (0-255) send as Flags-cmd
 if (strlen($mac) != 16) {
 	if (strlen($mac) > 24) exit();		// URL Attacked?
 	exit_error("MAC Len");
-}
-
-if ($sec_id > 0) {
-	/* TESTKEY erstmal */
-	$sec_key = "+XYZ+abc+123+ABC";
-	if (strlen($sec_key) == 0) exit_error("Encrypted, Server needs Key");
 }
 
 if (@file_exists(S_DATA . "/$mac/cmd/dbg.cmd")) {
@@ -162,18 +155,9 @@ if ($dbg) {	// log all incomming data local and also txt
 	fwrite($of, $data);
 	fclose($of);
 	$of = fopen(S_DATA . "/$mac/dbg/$dfn.txt", 'w'); // then open txt
-	fwrite($of, "SEC:$sec_id\n");
-}
-if ($sec_id == 1) {	// 1: AES-128-CBC --DECRYPT--
-	$iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-	$data = openssl_decrypt($data, "aes-128-cbc", $sec_key,  OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-	if (strlen($data) != $maxlen) {
-		exit_error("DECRYPT failed");
-	}
 }
 
-if ($sec_id > 0) $xlog = "($maxlen Bytes Data)";
-else $xlog = "($maxlen Bytes Data (plain))";
+$xlog = "($maxlen Bytes Data)";
 
 $dpath = S_DATA . "/$mac";				// Device Path
 $stage = -1;	// Assume Stage no stage for this communication
@@ -181,9 +165,7 @@ $expmore = 0; // Asume no reply
 
 $idx = 0;		// Index in data
 $ecmd = "";	// echo-command
-
-if ($sec_id)	$etext = "OK";                       // Text for Result (To node)
-else $etext = "OK(plain)";
+$etext = "OK";
 
 // load infos about this device
 $devi = array();
@@ -224,8 +206,7 @@ for (;;) {
 	// echo "CMD: $cmd LEN: $len \n";
 	if (strcmp($sollcrc, $istcrc)) {
 		$xlog .= "(CRC Error Pos. $bp0)"; // Probably Wron Key
-		if ($sec_id) $etext = "ERROR: Wrong Key?";
-		else $etext = "ERROR: CRC";
+		$etext = "ERROR: CRC";
 		break;	// CRC not OK
 	}
 	$devi['now'] = $now;	// Actual Server Time 
@@ -826,16 +807,8 @@ if ($expmore) $recmd = "\xFE:ServerRepeat**"; 	// Repeat
 else $recmd = "\xFF:ServerDone****"; // OK
 $elen = strlen($ecmd);
 $aesgap = 16 - ($elen & 15); // Add 1..16 Bytes (but at least 1)
-$ecmd .= substr($recmd, 0, $aesgap); // openssl wants complete Blocks
+$ecmd .= substr($recmd, 0, $aesgap); // prepare pption for HTTP-AES
 $elen += $aesgap;
-
-if ($sec_id == 1) {	// 1: AES-128-CBC --ENCRYPT--
-	$iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-	$ecmd = openssl_encrypt($ecmd, "aes-128-cbc", $sec_key,  OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-	if (strlen($ecmd) != $elen) {
-		exit_error("ENCRYPT failed");
-	}
-}
 
 $xlog .= "($elen Bytes Reply)";
 $devi['quota_out'] += $elen; // Save Quota out

@@ -21,8 +21,8 @@ if (!strcmp($api_key, L_KEY)) {
 }
 echo "<!DOCTYPE HTML><html><head>";
 
-if ($dev) $title = "Legacy LTrax Server Develop-Login V0.15";
-else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.15";
+if ($dev) $title = "Legacy LTrax Server Develop-Login V0.20";
+else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.20";
 
 $self = $_SERVER['PHP_SELF']; // Periodisch alle 30 Sekunden  auffrischen
 echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
@@ -40,7 +40,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	// dev.php DevPortal Script for LTrax. Details: see docu
 	// Only for Low-Level Developer Access!!!
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// V1.20 / 22.01.2021
+	// V0.20 / 11.04.2022
 	// todo: --- maybe LOCK makes sense for several files
 	// --- ensure user access (e.g. via keys)
 
