@@ -1,6 +1,6 @@
 <?PHP
 // -------------------------------------------------------------------
-// view.php - Show data (filtered)
+// view.php - Show data (filtered and source directory hidden)
 // 16.02.2022 j.wickenh
 
 error_reporting(E_ALL);
@@ -23,7 +23,9 @@ if (!strcasecmp($ext, ".php")) {
 	$data = file_get_contents($rfile);
 	$len = strlen($data);
 	if (!strcasecmp($ext, ".jpg") || !strcasecmp($ext, ".jpeg")) {
-		// Auto-header
+		header('Content-Type: image/jpeg');
+	}else if(!strcasecmp($ext, ".png")){
+		header("Content-type: image/png");		
 	} else {
 		header('Content-Type: text/plain');
 		echo "------------------------- '$mac/$fname': $len Bytes: ---------------------------\n";
