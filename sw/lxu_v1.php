@@ -1,6 +1,6 @@
 <?php
 // mcu_xxx.php Server-Communication Script for LTrax. Details: see docu
-// (C) 08.04.2020 - V1.08 joembedded@gmail.com  - JoEmbedded.de
+// (C) 17.05.2022 - V1.09 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
 error_reporting(E_ALL);
