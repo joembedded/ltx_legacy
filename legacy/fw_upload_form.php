@@ -1,4 +1,5 @@
 <?php
+// Legacy Firmware Upload Form - 20.06.2022
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
 include("../sw/lxu_loglib.php");
@@ -87,14 +88,11 @@ if (!$dev) {
 				fclose($of);
 				echo "Factory Key generated: " . implode(unpack("H*", $sec_key)) . "<br><br>";
 			}
-
-			echo "Owner Token or Key (only needed once for first Upload):";
-			echo "<input type='text' name ='token'><br>";
 		}
 		if (strlen($xlog)) add_logfile(); // Regular exit
-		echo "Firmware File (*.bin, *.sec):";
+		echo "Firmware File (*.bin, *.sec):"; // Allowed File Types BIN (raw!) and SEC
 	}else{
-		echo "Firmware File (*.sec):";
+		echo "Firmware File (*.sec):"; // Allowed File Types only SEC
 	}
 ?>
 
