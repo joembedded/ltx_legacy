@@ -1,7 +1,7 @@
 <?PHP
 // -------------------------------------------------------------------
 // view.php - Show data (filtered and source directory hidden)
-// 16.02.2022 j.wickenh
+// 29.06.2022 j.wickenh
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -28,6 +28,7 @@ if (!strcasecmp($ext, ".php")) {
 		header("Content-type: image/png");		
 	} else {
 		header('Content-Type: text/plain');
+		echo "\xEF\xBB\xBF";	// UTF8-Byte-Order-Mark
 		echo "------------------------- '$mac/$fname': $len Bytes: ---------------------------\n";
 	}
 	echo $data;

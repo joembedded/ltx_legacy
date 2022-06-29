@@ -68,6 +68,8 @@ if ($opt & DOWNLOAD_CSV) {
 	header("Content-Disposition: attachment; filename=$fname.csv"); // RFC2183: Querry Open/Save
 } else header('Content-Type: text/plain');
 
+echo "\xEF\xBB\xBF";	// UTF8-Byte-Order-Mark
+
 if ($dbg) {
 	echo "<DEBUG>\n";
 }

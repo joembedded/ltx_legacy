@@ -1,7 +1,7 @@
 <?PHP
 // -------------------------------------------------------------------
 // con_view.php - Connection Viewer (filtered)
-// 16.02.2022
+// 28.06.2022
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -40,11 +40,6 @@ if (strcasecmp($ext, ".txt")) {
 		$lac=intval(substr($line,$lacx+4));
 		$cid=intval(substr($line,$cidx+4));
 
-		$ta=intval(substr($line,$tax+3));
-
-		if($ta==255) $tar="";
-		else $tar= " ca. ".($ta*500+500)."mtr" ;	// in m
-
 		$ha="$mcc:$net:$lac:$cid";
 		@$cpcache[$ha]++;
 	}
@@ -60,16 +55,20 @@ if (strcasecmp($ext, ".txt")) {
 		$lacx=@strpos($line,"lac:");
 		$cidx=@strpos($line,"cid:");
 		$tax=@strpos($line,"ta:");
+		$dbx=@strpos($line,"dbm:");
 
 		$mcc=intval(substr($line,$mccx+4));
 		$net=intval(substr($line,$netx+4));
 		$lac=intval(substr($line,$lacx+4));
 		$cid=intval(substr($line,$cidx+4));
-
+		$dbm=intval(substr($line,$dbx+4));
 
 		$ha="$mcc:$net:$lac:$cid";	
 		if($cpcache[$ha]>0){	// Jede Zelle nur EINMAL anzeigen
-			echo "$line";
+			$utc=substr($line,0,$mccx);
+			echo "$utc mcc:$mcc net:$net lac:$lac cid:$cid ";
+
+			if($dbm!=0) echo "dbm:$dbm ";
 
 			$ta=intval(substr($line,$tax+3));
 			if($ta==255) $tar="";
@@ -77,7 +76,7 @@ if (strcasecmp($ext, ".txt")) {
 
 			$sqs = 'k='.G_API_KEY."&s=$mac&lnk=1&mcc=$mcc&net=$net&lac=$lac&cid=$cid"; // Link
 		
-			echo " - Cell($ccnt):" . $tar . " arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\">[Here]</a>";
+			echo " --- Cell($ccnt):" . $tar . " arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\">[Here]</a>";
 
 		/* Ask DB for each line is SLOW 
 		$sqs = 'k='.G_API_KEY."&s=$mac&lnk=0&mcc=$mcc&net=$net&lac=$lac&cid=$cid"; // No Link
@@ -89,7 +88,9 @@ if (strcasecmp($ext, ".txt")) {
 		}else{
 			$ncell=-$cpcache[$ha];
 			$utc=substr($line,0,$mccx);
-			echo "$utc (Cell($ncell))";	// Schon gezeigt, nur neue Zeit
+			echo "$utc ";
+			if($dbm!=0) echo "dbm:$dbm ";
+			echo "(Cell($ncell))";	// Schon gezeigt, nur neue Zeit
 		}
 		echo "<br>";
 	}
