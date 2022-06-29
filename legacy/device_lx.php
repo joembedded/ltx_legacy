@@ -181,13 +181,12 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 				$fwinfo[$tmp[0]] = $tmp[1];
 			}
 			echo "Firmware Bin-File found: '" . $fwinfo['fname_original'] . "'";
-			if ($fwinfo['cookie'] == @$devi['fw_cookie']) {
-				echo " is OK, Sent-Cnt:" . $fwinfo['sent'];
-				if (@$fwinfo['check']) echo " (Confirmed " . gmdate("d.m.Y H:i:s", $fwinfo['check']) . '](UTC))';
+			if (@$fwinfo['check'] > 0) {
+				echo " is OK, Send-Cnt:" . $fwinfo['sent'];
+				if (@$fwinfo['check']) echo " (Transfer OK: " . gmdate("d.m.Y H:i:s", $fwinfo['check']) . '](UTC))';
 				echo '<br>';
 			} else {
-				$cookie_str2 = gmdate("d.m.Y H:i:s", $fwinfo['cookie']);
-				echo ", <b><font color='red'>Update pending</font></b> ('$cookie_str2' (UTC)), Sent-Cnt:" . $fwinfo['sent'] . '<br>';
+				echo ", <b><font color='red'>Update pending</font></b> (Send-Cnt:" . $fwinfo['sent'] . ')<br>';
 			}
 		} else {
 			echo "(No Firmware Bin-File)<br>";

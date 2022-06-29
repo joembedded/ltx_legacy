@@ -1,6 +1,6 @@
 <?php
 // mcu_xxx.php Server-Communication Script for LTrax. Details: see docu
-// (C) 17.05.2022 - V1.09 joembedded@gmail.com  - JoEmbedded.de
+// (C) 27.06.2022 - V1.10 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
 error_reporting(E_ALL);
@@ -95,9 +95,9 @@ function trigger($reason)
 		if ($wres != strlen($out)) {
 			$xlog .= "(ERROR; Write to Trigger-Script failed)";
 		} else {
-			$rres = fread($fp, 40);	// Only interested in the first few chars "HTTP/1.1 200 OK" or "HTTP/1.1 404 Not Found";
+			$rres = fread($fp, 1000);	// Only interested in the first few chars "HTTP/1.1 200 OK" or "HTTP/1.1 404 Not Found";
 			if (strpos($rres, " 200 ") != false) {
-				//$xlog.="(Trigger-Script OK)"; // Not necessary to record 
+				// $xlog.="(Trigger-Script OK '$rres')"; // Norm. not necessary to record
 			} else if (strpos($rres, " 404 ") != false) { // Normally: Busy Trigger takes longer..
 				$xlog .= "(ERROR: Trigger-Script not found)";
 			}  // Syntax-Erros in Script not catched!
@@ -501,7 +501,7 @@ if ($send_cmd <= 0 && file_exists("$dpath/cmd/_firmware.sec.umeta")) { // Check 
 		$tmp = explode("\t", $line);
 		$fwinfo[$tmp[0]] = $tmp[1];
 	}
-	if ($fwinfo['cookie'] != $devi['fw_cookie']) {	// Different!
+	if (@$fwinfo['check'] < 1) {	// New Firmware
 		if ($stage == 0) {	// Stage0: Send firmware
 			$fwinfo['sent']++;	// Save Sent No.
 			if ($fwinfo['sent'] > 4) {
@@ -533,16 +533,12 @@ if ($send_cmd <= 0 && file_exists("$dpath/cmd/_firmware.sec.umeta")) { // Check 
 			}
 		} else if ($fwinfo['sent'] <= 4 && @$fwinfo['check'] < 1) { // Has still the old firmware, but stage>0
 			$xlog .= "(Firmware File: Transfer OK)";	// Now we can do the rest
-		}
-	} else {	// Version was the same - After once confirmed, do not send again (to not interfer with local updates)
-		if (@$fwinfo['check'] < 1) {	// Unconfirmed
-			$fwinfo['check'] = $now;		// Confirm Software
+			$fwinfo['check'] = $now;		// Confirm Transfer
 			$of2 = fopen("$dpath/cmd/_firmware.sec.umeta", 'w');
 			foreach ($fwinfo as $key => $val) {
 				fwrite($of2, "$key\t$val\n");
 			}
 			fclose($of2);
-			$xlog .= "(New Firmware confirmed)";
 		}
 	}
 }

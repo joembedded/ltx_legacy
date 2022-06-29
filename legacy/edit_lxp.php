@@ -66,7 +66,7 @@
 		"Server[$41]",
 		"Script[$41]",
 		"API Key[$41]",
-		"ConFlags[0..255] (B0:VB B1:ROAM B4:LOG_FILE B5:LOG_UART B7:DBG)",
+		"ConFlags[0..255] (B0:VB B1:ROAM B4:LOG_FILE (B5:LOG_UART) B7:DBG)",
 		"Pin[0..65535] (opt)",
 		"User[$41]",
 		"Password[$41]",
@@ -102,7 +102,7 @@
 
 		$data=file($rfile,FILE_IGNORE_NEW_LINES);
 		$action="edit2file.php";
-		echo"<!DOCTYPE HTML><html><head><title>Edit $fname</title></head><body>\n";
+		echo"<!DOCTYPE HTML><html><head><meta charset='utf-8' /><title>Edit $fname</title></head><body>\n";
 		echo "<b>*** ONLY FOR DEVELOPMENT ***</b><br>";
 		echo "Edit '$sfname':<br>";
         echo"<form name=\"form\" action=\"$action\" method=\"post\">\n";

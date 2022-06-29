@@ -1,5 +1,9 @@
 <?php
-// Legacy Firmware Upload Form - 20.06.2022
+/* Legacy Firmware Upload Form - 26.06.2022
+* New: Only .SEC-Files since FW 1.0
+*
+* V1.3 - 27.06.2022(C) JoEmbedded 
+*/
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
 include("../sw/lxu_loglib.php");
@@ -28,6 +32,7 @@ if (!$dev) {
 
 <body>
 	<?php
+	/*** V1.0: Only .SEC-Files allowed 
 	// Functions (as GenerateBadge)
 	function get_factory_key()
 	{
@@ -52,7 +57,7 @@ if (!$dev) {
 		}
 		return pack("H*", $obj->fwkey);	// Make real string from Hex-String
 	}
-
+	*/
 
 
 	// ----------- M A I N ---------------
@@ -69,7 +74,7 @@ if (!$dev) {
 	$dpath =	$dpath = S_DATA . "/$mac/cmd/";
 	$xlog = "";
 
-
+	/*** V1.0: Only .SEC-Files allowed 
 	if( strlen(KEY_API_GL) && strlen(KEY_SERVER_URL) ){
 
 		@include("$dpath/def_factory_key.php"); // If available: Use it
@@ -91,12 +96,14 @@ if (!$dev) {
 		}
 		if (strlen($xlog)) add_logfile(); // Regular exit
 		echo "Firmware File (*.bin, *.sec):"; // Allowed File Types BIN (raw!) and SEC
-	}else{
+	}else
+	*****/ 
+	{
 		echo "Firmware File (*.sec):"; // Allowed File Types only SEC
 	}
 ?>
 
-	<input type="file" name="X"><br><br>
+	<input type="file" name="X" accept=".sec"><br><br> 
 	<input type="Submit" name="UP"> <input type="reset" name="Reset">
 	</form>
 </body>

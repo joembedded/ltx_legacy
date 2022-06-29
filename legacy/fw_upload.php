@@ -1,10 +1,12 @@
 <?php
-// Upload a new Firmware-File to a device and store it encrypted
-// as '_firmware.sec'. If no key-File is found, the Factory-Key is downloaded from JesFs-Home
-// Factory-key ist stored as php definition to prevent external access
-// Firmeware-File either per POST or viaURL_parameter (if already somewhere in the local Filesystem)
-
-// V1.2 2020(C) JoEmbedded 
+/* Upload a new Firmware-File to a device and store it encrypted
+* as '_firmware.sec'. If no key-File is found, the Factory-Key is downloaded from JesFs-Home
+* Factory-key ist stored as php definition to prevent external access
+* Firmeware-File either per POST or viaURL_parameter (if already somewhere in the local Filesystem)
+* New: Only .SEC-Files since FW 1.0
+*
+* V1.3 - 27.06.2022(C) JoEmbedded 
+*/
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -23,9 +25,12 @@ if (!$dev) {
 	echo "ERROR: Access denied!";
 	exit();
 }
-define("HDR0_MAGIC", "\x4F\x9C\x9B\xE7"); // in E79B9C4F LE-Format - PHP hat Probleme mit U32-Zahlen, daher STRINGS
 
 //---------------- Functions ---------------
+
+/*** V1.0: Only .SEC-Files allowed 
+define("HDR0_MAGIC", "\x4F\x9C\x9B\xE7"); // in E79B9C4F LE-Format - PHP hat Probleme mit U32-Zahlen, daher STRINGS
+
 function get_factory_key()
 {
 	global $mac, $xlog, $token;
@@ -70,6 +75,7 @@ function str_u32l($uv32)
 	$ret = chr($uv32) . chr($uv32 >> 8) . chr($uv32 >> 16) . chr($uv32 >> 24);
 	return $ret;
 }
+*/ // V1.0
 
 
 //---------------- MAIN ---------------
@@ -98,10 +104,9 @@ if (strlen($mac) != 16) {
 	if (strlen($mac) > 24) exit();		// URL Attacked?
 	exit_error("MAC Len");
 }
-// Never generate Updates for unexisten Loggers...
+// Never generate Updates for unexisting Loggers...
 if (!file_exists(S_DATA . "/$mac") || check_dirs()) exit_error("Error (Directory/MAC not found)");
 if (empty($fname)) exit_error("No Data (Need Firmware File)");
-
 
 echo "Check File '$freal_name'...\n";
 if ($fsize < 10000 || $fsize > 1000000) {	// firmware <10k impossible, >1M ?!
@@ -120,8 +125,9 @@ if(substr($freal_name,-4) === '.sec' ){
 		exit_error("File is either no firmware file or corrupt! (SIZE)");
 	}
 	$fw_sec = $fw_bin;
-	$cookie = $now;
-}else{
+}
+/*** V1.0: Only .SEC-Files allowed 
+else{
 
 	$magic = substr($fw_bin, 0, 4);
 	if ($dbg) {
@@ -152,10 +158,6 @@ if(substr($freal_name,-4) === '.sec' ){
 	if ($sollcrc != $istcrc) { // String Compare!
 		exit_error("File is either no firmware file or corrupt! (CRC32)");
 	}
-
-	$cookie = u32l_str(substr($fw_bin, 20, 4));
-	$cookie_str = gmdate("d.m.Y H:i:s", $cookie);
-	$xlog .= "(Date:'$cookie_str'(UTC))";
 
 	echo "Firmware dated '$cookie_str' (UTC)\n";
 	echo "Loaded Firmware '$freal_name': Size $fsize Bytes\n";
@@ -200,13 +202,13 @@ if(substr($freal_name,-4) === '.sec' ){
 
 	echo "Writing encrypted firmware '_firmware.sec'\n";
 }
+*/  // V1.0
+
 $of = fopen($dpath . '_firmware.sec', 'wb');
 fwrite($of, $fw_sec);
 fclose($of);
 
 $of = fopen($dpath . '_firmware.sec.umeta', 'w');	// Keep some (u)meta data
-fwrite($of, "cookie\t$cookie\n");
-
 fwrite($of, "fname_original\t$freal_name\n");		// Only for info
 fwrite($of, "sent\t0\n");					// Count Number of transmits
 fclose($of);
