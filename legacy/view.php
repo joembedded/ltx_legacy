@@ -1,7 +1,7 @@
 <?PHP
 // -------------------------------------------------------------------
 // view.php - Show data (filtered and source directory hidden)
-// 29.06.2022 j.wickenh
+// 04.07.2022 j.wickenh
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -12,7 +12,7 @@ $fname = $_GET["f"];
 
 $rfile = S_DATA . "/$mac/$fname";
 
-$ext = substr($fname, strpos($fname, '.'));
+$ext = substr($fname, strrpos($fname, '.'));
 if (!strcasecmp($ext, ".php")) {
 	header('Content-Type: text/plain');
 	echo "<ERROR: Not allowed Format>\n"; // Filter illegal formats (Never display contents of PHP)

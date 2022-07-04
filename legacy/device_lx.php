@@ -30,7 +30,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 09.06.2022
+	// Version: 04.07.2022
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
 	// todo: Cross-Site-Scripting irgendwo?
@@ -483,6 +483,13 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			echo "<a href=\"view.php?s=$mac&f=_info_wea_old.txt\">Old Info (Warnings/Errors/Alarms) '_info_wea_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		} else {
 			echo "Old Info (Warnings/Errors/Alarms) '_info_wea_old.txt' (not found)<br>";
+		}
+
+		$ds = @filesize("$dpath/userio.txt");
+		if ($ds > 0) {
+			$dt = $now - filemtime("$dpath/userio.txt");
+			$fa = secs2period($dt);
+			echo "<a href=\"view.php?s=$mac&f=userio.txt\">User Commands 'userio.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		}
 
 		echo "<br><a href=\"fw_upload_form.php?s=$mac\">Upload new Firmware File</a><br>";
