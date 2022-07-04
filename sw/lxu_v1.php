@@ -1,38 +1,17 @@
 <?php
-// mcu_xxx.php Server-Communication Script for LTrax. Details: see docu
-// (C) 27.06.2022 - V1.10 joembedded@gmail.com  - JoEmbedded.de
+// lxu_v1.php Server-Communication Script for LTrax. Details: see docu
+// (C) 04.07.2022 - V1.20 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
 error_reporting(E_ALL);
 include("conf/api_key.inc.php");
 include("lxu_loglib.php");
 
-// ----- reads i32 from $data (signed) BE -----
-function r4s_data($dix)
-{
-	global $data;
-	$h = ord($data[$dix++]);
-	if ($h > 127) {    // PHP5 problemes with 32Bit-Carry, use 1-Komplement
-		$res = ((255 - $h) * 256) + 255 - ord($data[$dix++]);
-		$res = ($res * 256) + 255 - ord($data[$dix++]);
-		$res = ($res * 256) + 256 - ord($data[$dix]);
-	} else {
-		$res = ($h * 256) + ord($data[$dix++]);
-		$res = ($res * 256) + ord($data[$dix++]);
-		$res = ($res * 256) + ord($data[$dix]);
-	}
-	return $res;
-}
-
 // ----- reads u32 from $data  BE -----   32Bit.u from String
 function r4u_data($dix)
 {
 	global $data;
-	$res = ord($data[$dix++]);
-	$res = ($res * 256) + ord($data[$dix++]);
-	$res = ($res * 256) + ord($data[$dix++]);
-	$res = ($res * 256) + ord($data[$dix]);
-	return $res;
+	return unpack("N",$data,$dix)[1]; // U32
 }
 // ----- reads u16 from $data  BE -----   16Bit.u from String
 function r2u_data($dix)
@@ -41,12 +20,10 @@ function r2u_data($dix)
 	$res = ord($data[$dix]) * 256 + ord($data[$dix + 1]);
 	return $res;
 }
-
 // ------ u32 to string BE ----
 function str_u32($uv32)
 {
-	$ret = chr(($uv32 >> 24) & 255) . chr(($uv32 >> 16) & 255) . chr(($uv32 >> 8) & 255) . chr($uv32 & 255);
-	return $ret;
+	return pack("N",$uv32);
 }
 
 // ------- Debug function: Show HEX contents of a string -----
@@ -88,7 +65,7 @@ function trigger($reason)
 		stream_set_timeout($fp, 0, 990000); // Wait max. 990 msec for a response of trigger
 
 		$out = "GET $tscript?$arg HTTP/1.0\r\n";
-		$out .= "Host: $server:$port\r\n"; // Assume: Ssame dir as self
+		$out .= "Host: $server:$port\r\n"; // Assume: Same dir as self
 		$out .= "Connection: Close\r\n\r\n";
 
 		$wres = fwrite($fp, $out);
@@ -243,14 +220,12 @@ for (;;) {
 			$devi['reason'] = $reason;	// Why? 
 
 			switch ($reason & 15) { //
-					//case 1:	$rea_str="(RADIO"; break;
 				case 2:
 					$rea_str = "(AUTO";
 					break;
 				case 3:
 					$rea_str = "(MANUAL";
 					break;
-					//case 4: echo "SMS"; break;
 				default:
 					$rea_str = "(UNKNOWN(reason=$reason)";
 					break;	// Alarm e.g. t.b.d
@@ -297,6 +272,8 @@ for (;;) {
 			$fdate = r4u_data($bp0 + 9);
 			$fnlen = ord($data[$bp0 + 13]);
 			$fname = substr($data, $bp0 + 14, $fnlen); // fname on Device
+			if (!strcasecmp(substr($fname, strrpos($fname, '.')), ".php")) $fname.='_'; 
+			
 			if ($dbg) fwrite($of, "A3: FILE:$fname, Len:$flen, Date:$fdate, F:$fflags CRC:" . dechex($fcrc) . "\n");
 
 			// Save to VDISK-Data
@@ -357,6 +334,7 @@ for (;;) {
 			$fflags = ord($data[$bp0 + 8]);
 			$fnlen = ord($data[$bp0 + 9]);
 			$fname = substr($data, $bp0 + 10, $fnlen);	// extract name
+			if (!strcasecmp(substr($fname, strrpos($fname, '.')), ".php")) $fname.='_'; // 
 
 			$flen = $len - $fnlen - 10; // Only len of this block!
 			if ($dbg) fwrite($of, "A4: FILE $fname Pos0:$fpos0, Len:$flen, Date:$fdate, F:$fflags (uploaded)\n");
@@ -456,8 +434,9 @@ for (;;) {
 			fclose($of2);
 			$devi['lut_cont'] = addcslashes($user_content, "\n\r<>&"); // 
 			$devi['lut_date'] = $now;
+			file_put_contents("$dpath/userio.txt",gmdate("d.m.y H:i:s", $now)." UTC Reply: '$user_content'\n",FILE_APPEND);
 			break;
-		case 0xA7: 	// IMSI (s String)
+		case 0xA7: 	// ICCID (String)
 			$imsi = trim(substr($data, $bp0, $len));
 			if ($dbg) fwrite($of, "A7: IMSI '$imsi'\n");
 			$devi['imsi'] = $imsi;
@@ -742,20 +721,23 @@ if ($send_cmd <= 0) {
 			}
 		}
 		@$cinfo['sent']++;
-		for (;;) { // loop onlf for flow
+		for (;;) { // loop only for flow
 			if ($cinfo['sent'] > 1) {
+				$cres="";
 				if (($cinfo['now'] == $devi['con_id']) && ($cinfo['stage'] + 1 == $stage)) {
 					$xlog .= "(User Command '$ucmd' confirmed)";
 					@unlink("$dpath/cmd/usercmd.cmd");
 					@unlink("$dpath/cmd/usercmd.cmeta");
-					$devi['luc_state'] = "Confirmed";
-					break;
+					$cres = "Confirmed";
+				}else if ($cinfo['sent'] > 4) {
+					$xlog .= "(ERROR: User Command '$ucmd' send failed)";
+					$cres = "Send failed";
 				}
-				if ($cinfo['sent'] > 4) {
-					$xlog .= "(ERROR: User Command '$ucmd' failed)";
+				if(strlen($cres)){
 					@unlink("$dpath/cmd/usercmd.cmd");
 					@unlink("$dpath/cmd/usercmd.cmeta");
-					$devi['luc_state'] = "Failed";
+					$devi['luc_state'] = $cres;
+					file_put_contents("$dpath/userio.txt",gmdate("d.m.y H:i:s", $now)." UTC $cres: '$ucmd' \n",FILE_APPEND);
 					break;
 				}
 			}
