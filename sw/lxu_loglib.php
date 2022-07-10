@@ -1,5 +1,5 @@
 <?php
-// FILE: lxu_loglib.php  - Version:10.01.2021
+// FILE: lxu_loglib.php  - Version:10.07.2022
 // include-module logfile only for LXU modules (path on 1.st level)!
 
 // ---- basic directory service ---
@@ -93,12 +93,14 @@ function add_logfile()
 		if (@filesize($logpath . "log.txt") > 50000) {	// Device LOG
 			@unlink($logpath . "_log_old.txt");
 			rename($logpath . "log.txt", $logpath . "_log_old.txt");
-			//$xlog.=" (Device 'log.txt' -> '_log_old.txt')";
 
+			if (@filesize($logpath . "userio.txt") > 50000) {	// User Commands
+				@unlink($logpath . "_userio_old.txt");
+				rename($logpath . "userio.txt", $logpath . "_userio_old.txt");
+			}
 			if (@filesize($logpath . "conn_log.txt") > 50000) {	// Connection Log
 				@unlink($logpath . "_conn_log_old.txt");
 				rename($logpath . "conn_log.txt", $logpath . "_conn_log_old.txt");
-				//$xlog.=" (Connections 'log.txt' -> '_log_old.txt')";
 			}
 		}
 

@@ -1,6 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 04.07.2022 - V1.20 joembedded@gmail.com  - JoEmbedded.de
+// (C) 10.07.2022 - V1.21 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
 error_reporting(E_ALL);
@@ -17,12 +17,12 @@ function r4u_data($dix)
 function r2u_data($dix)
 {
 	global $data;
-	$res = ord($data[$dix]) * 256 + ord($data[$dix + 1]);
-	return $res;
+	return unpack("n",$data,$dix)[1]; // U16
 }
 // ------ u32 to string BE ----
 function str_u32($uv32)
 {
+	global $data;
 	return pack("N",$uv32);
 }
 
@@ -403,9 +403,8 @@ for (;;) {
 			fclose($of2);
 
 			// Store also the fragment in in_new
-			// Temo_filename is preceeded by filedate plus offset
+			// Temp_filename is preceeded by filedate plus offset
 			$ftemp = gmdate("Ymd_His", $fdate) . "_$fpos0" . '_';
-
 			$of2 = fopen("$dpath/in_new/$ftemp$fname", 'wb'); // Delta as single file
 			$newdata = substr($data, $bp0 + 10 + $fnlen, $flen);
 			fputs($of2, $newdata);
@@ -427,14 +426,15 @@ for (;;) {
 			fclose($of2);
 			break;
 		case 0xA6: 	// User_info (Annahme: TEXT-String)
-			$user_content = substr($data, $bp0, $len);
+			$user_content = addcslashes(substr($data, $bp0, $len), "\n\r<>&"); // 
 			if ($dbg) fwrite($of, "A6: User '$user_content'($len)\n");
 			$of2 = fopen("$dpath/user_contents.txt", 'a'); // List of User Data
 			fputs($of2, gmdate("d.m.y H:i:s ", $now) . "(Stage:$stage) '$user_content'\n");
 			fclose($of2);
-			$devi['lut_cont'] = addcslashes($user_content, "\n\r<>&"); // 
+			$devi['lut_cont'] = $user_content;
 			$devi['lut_date'] = $now;
 			file_put_contents("$dpath/userio.txt",gmdate("d.m.y H:i:s", $now)." UTC Reply: '$user_content'\n",FILE_APPEND);
+			file_put_contents("$dpath/in_new/".gmdate("Ymd_His", $now)."_userio.edt","<UCMD:$user_content>"); // edt: DirectWay...
 			break;
 		case 0xA7: 	// ICCID (String)
 			$imsi = trim(substr($data, $bp0, $len));

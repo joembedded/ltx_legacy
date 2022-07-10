@@ -464,8 +464,6 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			$dt = $now - filemtime("$dpath/_conn_log_old.txt");
 			$fa = secs2period($dt);
 			echo "<a href=\"con_view.php?s=$mac&f=_conn_log_old.txt\">Old Connection Logfile '_conn_log_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
-		} else {
-			echo "Old Connection Logfile '_conn_log_old.txt' (not found)<br>";
 		}
 
 		$ds = @filesize("$dpath/info_wea.txt");
@@ -473,16 +471,12 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			$dt = $now - filemtime("$dpath/info_wea.txt");
 			$fa = secs2period($dt);
 			echo "<a href=\"view.php?s=$mac&f=info_wea.txt\">Info (Warnings/Errors/Alarms) 'info_wea.txt'</a> ($ds Bytes, Age: $fa)<br>";
-		} else {
-			echo "Info (Warnings/Errors/Alarms) 'info_wea.txt' (not found)<br>";
 		}
 		$ds = @filesize("$dpath/_info_wea_old.txt");
 		if ($ds > 0) {
 			$dt = $now - filemtime("$dpath/_info_wea_old.txt");
 			$fa = secs2period($dt);
 			echo "<a href=\"view.php?s=$mac&f=_info_wea_old.txt\">Old Info (Warnings/Errors/Alarms) '_info_wea_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
-		} else {
-			echo "Old Info (Warnings/Errors/Alarms) '_info_wea_old.txt' (not found)<br>";
 		}
 
 		$ds = @filesize("$dpath/userio.txt");
@@ -490,6 +484,12 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			$dt = $now - filemtime("$dpath/userio.txt");
 			$fa = secs2period($dt);
 			echo "<a href=\"view.php?s=$mac&f=userio.txt\">User Commands 'userio.txt'</a> ($ds Bytes, Age: $fa)<br>";
+		}
+		$ds = @filesize("$dpath/_userio_old.txt");
+		if ($ds > 0) {
+			$dt = $now - filemtime("$dpath/_userio_old.txt");
+			$fa = secs2period($dt);
+			echo "<a href=\"view.php?s=$mac&f=_userio_old.txt\">Old User Commands '_userio_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		}
 
 		echo "<br><a href=\"fw_upload_form.php?s=$mac\">Upload new Firmware File</a><br>";
