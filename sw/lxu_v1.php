@@ -3,6 +3,9 @@
 // (C) 10.07.2022 - V1.21 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
+// *TODO* Achtung: PHP8 meckert u.a. null als String-Argument deprecated an. *TODO*
+// Evtl. "schnelle Hilfe": error_reporting (E_ALL & ~E_DEPRECATED);
+
 error_reporting(E_ALL);
 include("conf/api_key.inc.php");
 include("lxu_loglib.php");
@@ -103,7 +106,7 @@ $dfn = gmdate("Ymd_His", $now);		// 'disk_filename_from_now' (sortable)
 
 $send_cmd = -1;						// If set (0-255) send as Flags-cmd
 
-if (strlen($mac) != 16) {
+if (!isset($mac) || strlen($mac) != 16) {
 	if (strlen($mac) > 24) exit();		// URL Attacked?
 	exit_error("MAC Len");
 }
@@ -113,7 +116,7 @@ if (@file_exists(S_DATA . "/$mac/cmd/dbg.cmd")) {
 }
 
 // Check Key before loading data
-if (!$dbg && strcmp($api_key, D_API_KEY)) {
+if (!$dbg && (!isset($api_key) || strcmp($api_key, D_API_KEY))) {
 	exit_error("API Key");
 }
 
