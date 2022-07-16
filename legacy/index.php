@@ -13,6 +13,7 @@ if (isset($_REQUEST['k'])) {
 } else {
 	$api_key = @$_SESSION['key'];
 }
+if(!isset($api_key)) $api_key=""; 
 if (!strcmp($api_key, L_KEY)) {
 	$dev = 1;	// Dev-Funktionen anzeigen
 } else {
@@ -21,8 +22,8 @@ if (!strcmp($api_key, L_KEY)) {
 }
 echo "<!DOCTYPE HTML><html><head>";
 
-if ($dev) $title = "Legacy LTrax Server Develop-Login V0.20";
-else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.20";
+if ($dev) $title = "Legacy LTrax Server Develop-Login V0.21";
+else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.21";
 
 $self = $_SERVER['PHP_SELF']; // Periodisch alle 30 Sekunden  auffrischen
 echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
