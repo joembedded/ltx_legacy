@@ -41,7 +41,7 @@ function show_str($rem, $str)
 	echo "\n";
 }
 
-// ---------------- Trigger: Externel async Script lxu_trigger.php -------------------------
+// ---------------- Trigger: External async Script lxu_trigger.php -------------------------
 function trigger($reason)
 {
 	global $xlog, $mac, $dbg; // xlog only as parameter
