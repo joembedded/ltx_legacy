@@ -1,6 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 10.07.2022 - V1.21 joembedded@gmail.com  - JoEmbedded.de
+// (C) 22.10.2022 - V1.22 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
 // *TODO* Achtung: PHP8 meckert u.a. null als String-Argument deprecated an. *TODO*
@@ -658,9 +658,7 @@ if ($send_cmd <= 0) {
 				$fputa['sent']++;	// Save Sent No.
 
 				if ($fputa['sent'] > 1) {
-					//$xlog.="(INFO: File '$putfn' send only once)"; // Confirmation fehlt noch->rmove und put nach Files..
-
-					// BESSER: Sende-Stage und Time merkene und nur wenn stage+1 = OK entfernen
+					// Sende-Stage und Time merkene und nur wenn stage+1 = OK entfernen
 					if (($fputa['now'] == $devi['con_id']) && ($fputa['stage'] + 1 == $stage)) {
 						$xlog .= "(Put File '$putfn' confirmed)";
 						// Copy File to files
@@ -690,7 +688,9 @@ if ($send_cmd <= 0) {
 					}
 				}
 				// Write PUT Data file with CRC32
-				$payload = chr(22) . chr(strlen($putfn)) . $putfn . file_get_contents("$dpath/put/$putfn");	// 22 WRITE|CREATE|CRC
+				$pflags = 22;	// 22 WRITE|CREATE|CRC - Standard
+				if(!strcmp($putfn,"iparam.lxp")) $pflags |= 64; // Exception: 'iparam.lxp' always synced!
+				$payload = chr($pflags) . chr(strlen($putfn)) . $putfn . file_get_contents("$dpath/put/$putfn");	
 				$tecmd = "\xC1" . str_u32(strlen($payload)) . $payload; // Blocklen ist 5+datalen+4_crclen $C1: Download
 				$ecmd .= $tecmd . str_u32((~crc32($tecmd)) & 0xFFFFFFFF); // Append CRC
 
