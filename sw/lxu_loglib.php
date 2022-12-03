@@ -1,5 +1,5 @@
 <?php
-// FILE: lxu_loglib.php  - Version:10.07.2022
+// FILE: lxu_loglib.php  - Version:26.11.2022
 // include-module logfile only for LXU modules (path on 1.st level)!
 
 // ---- basic directory service ---
@@ -76,6 +76,7 @@ function add_logfile()
 		$xlog .= " (Main 'log.txt' -> '_log_old.txt')";
 	}
 
+	if(!isset($mac)) $mac="UNKNOWN_MAC";
 	if ($dbg) $xlog .= "(DBG:$dbg)";
 
 	$log = @fopen($sdata . "/log/log.txt", 'a');

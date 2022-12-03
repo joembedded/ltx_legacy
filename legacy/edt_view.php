@@ -4,7 +4,7 @@
 	* EDT ("EasyDaTa") is a very flexible and easy-2-use file format to 
 	* store logged data. Read the docu!
 	*
-    * Version: V1.10 - 15.3.2019 
+    * Version: V1.11 - 27.11.2022
 	* (C) JoEmbedded.de
     * ---------------------------------------------------------------------- */
 
@@ -214,7 +214,7 @@ foreach ($data as $line) {
 
 			if ($opt & NO_LINECNT) $oline .= $ts;	// Time Only
 			else $oline .= "$cnt, $ts"; // No and Timestamp
-			if ($secs < 1526030617 || $secs >= 0x7FFFFFFF) {
+			if ($secs < 1526030617 || $secs >= 0xF0000000) {  // 2097
 				if ($st_flag == 0) {
 					$st_flag = 1;	// Emit Warning only once
 					$warn_cnt++;

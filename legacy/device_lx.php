@@ -30,7 +30,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 04.07.2022
+	// Version: 27.11.2022
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
 	// todo: Cross-Site-Scripting irgendwo?
@@ -86,15 +86,17 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			// echo "Line: $line<br>";
 		}
 	}
-
+	$typ=intval(@$devi['typ']); // >0: Logger
 	//--- Show avilabale infos ---
 	echo "</p><p><b>Device Info:</b><br>";
 
-	echo "Name: ";
-	$iparam_info =  @file(S_DATA . "/$dpath/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
-	if (@isset($iparam_info[5])) echo "'<b>".htmlspecialchars($iparam_info[5])."</b>'";
-	else echo "(NO 'iparam.lxp')";
-	echo "<br>";
+	if($typ>0){
+		echo "Name: ";
+		$iparam_info =  @file(S_DATA . "/$dpath/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
+		if (@isset($iparam_info[5])) echo "'<b>".htmlspecialchars($iparam_info[5])."</b>'";
+		else echo "(NO 'iparam.lxp')";
+		echo "<br>";
+	}
 
 	$user_info = @file("$dpath/user_info.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 	if (@$user_info[0]) echo "Legacy Name: '<b>" . htmlspecialchars($user_info[0]) . "</b>'";
@@ -119,9 +121,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		case 3:
 			echo "MANUAL";
 			break;
-		case 4:
-			echo "SMS";
-			break;
+		// case 4:	echo "SMS";	break;
 		default:
 			echo "UNKNOWN(reason=$reason)";
 			break;	// Alarm e.g. t.b.d
@@ -135,9 +135,11 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo "<b>WARNING: Last Transfer pending or incomplete</b><br>";
 	}
 
-	$dt = $devi['sdelta'];  // $devi['dtime']-$devi['now']; different for long transfers
-	echo "Deviation to Server: $dt secs<br>";
-	echo "Transmission Count (All/OK): " . $devi['conns'] . '/' . @$devi['trans'] . '<br>';
+	if($typ>0){
+		$dt = $devi['sdelta'];  // $devi['dtime']-$devi['now']; different for long transfers
+		echo "Deviation to Server: $dt secs<br>";
+		echo "Transmission Count (All/OK): " . $devi['conns'] . '/' . @$devi['trans'] . '<br>';
+	}
 
 	if (@strlen(DB_NAME)) {
 		$quota = @file("$dpath/quota_days.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -158,49 +160,55 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo " - Total (In/Out): " . (@$devi['quota_in'] + @$devi['total_in']) . '/' . (@$devi['quota_out'] + @$devi['total_out']);
 		echo " Since: [" . gmdate("d.m.Y H:i:s", @file_get_contents("$dpath/date0.dat")) . "](UTC)<br>"; // filectime() scheint sich fuer DIRs zu aendern..
 
-		echo "Device Firmware ";
-		if (!empty($devi['fw_ver'])) echo "Version: V" . ($devi['fw_ver'] / 10);
-		else echo "(unknown)";
-		$fwt = @$devi['fw_cookie'];
-		if ($fwt < 1526030617 || $fwt > 2472110617) $cookie_str = "<b>(WARNING: Bootloader Release unknown)</b>"; // Now+30 years
-		else $cookie_str = '[' . gmdate("d.m.Y H:i:s", $fwt) . '](UTC)';
-		echo " (dated: $cookie_str)";
-		echo "<br>";
-		echo "Device Type: ";
-		if (!empty($devi['typ'])) echo $devi['typ'] . "<br>";
-		else echo "(unknown)<br>";
-		echo "SIM (ICCID): ";
-		if (!empty($devi['imsi'])) echo "'" . $devi['imsi'] . "'<br>";
-		else echo "(unknown)<br>";
+		if($typ>0){
+			echo "Device Firmware ";
+			if (!empty($devi['fw_ver'])) echo "Version: V" . ($devi['fw_ver'] / 10);
+			else echo "(unknown)";
+			$fwt = @$devi['fw_cookie'];
+			if ($fwt < 1526030617 || $fwt > 0xF0000000) $cookie_str = "<b>(WARNING: Bootloader Release unknown)</b>"; // 2097
+			else $cookie_str = '[' . gmdate("d.m.Y H:i:s", $fwt) . '](UTC)';
+			echo " (dated: $cookie_str)";
+			echo "<br>";
+			echo "Device Type: ";
+			if (!empty($devi['typ'])) echo $devi['typ'] . "<br>";
+			else echo "(unknown)<br>";
+			echo "SIM (ICCID): ";
+			if (!empty($devi['imsi'])) echo "'" . $devi['imsi'] . "'<br>";
+			else echo "(unknown)<br>";
 
-		if (@file("$dpath/cmd/_firmware.sec.umeta")) { // META is important, not secured file...
-			$fwinfo = array();
-			$lines = file("$dpath/cmd/_firmware.sec.umeta", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-			foreach ($lines as $line) {
-				$tmp = explode("\t", $line);
-				$fwinfo[$tmp[0]] = $tmp[1];
-			}
-			echo "Firmware Bin-File found: '" . $fwinfo['fname_original'] . "'";
-			if (@$fwinfo['check'] > 0) {
-				echo " is OK, Send-Cnt:" . $fwinfo['sent'];
-				if (@$fwinfo['check']) echo " (Transfer OK: " . gmdate("d.m.Y H:i:s", $fwinfo['check']) . '](UTC))';
-				echo '<br>';
+			if (@file("$dpath/cmd/_firmware.sec.umeta")) { // META is important, not secured file...
+				$fwinfo = array();
+				$lines = file("$dpath/cmd/_firmware.sec.umeta", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+				foreach ($lines as $line) {
+					$tmp = explode("\t", $line);
+					$fwinfo[$tmp[0]] = $tmp[1];
+				}
+				echo "Firmware Bin-File found: '" . $fwinfo['fname_original'] . "'";
+				if (@$fwinfo['check'] > 0) {
+					echo " is OK, Send-Cnt:" . $fwinfo['sent'];
+					if (@$fwinfo['check']) echo " (Transfer OK: " . gmdate("d.m.Y H:i:s", $fwinfo['check']) . '](UTC))';
+					echo '<br>';
+				} else {
+					echo ", <b><font color='red'>Update pending</font></b> (Send-Cnt:" . $fwinfo['sent'] . ')<br>';
+				}
 			} else {
-				echo ", <b><font color='red'>Update pending</font></b> (Send-Cnt:" . $fwinfo['sent'] . ')<br>';
+				echo "(No Firmware Bin-File)<br>";
 			}
-		} else {
-			echo "(No Firmware Bin-File)<br>";
+		}else{
+			echo "Device Type: ".$devi['typ'] . "<br>";
 		}
 	}
 
 	if (!$demo) {
-		echo "Disk available: ";
-		if (isset($devi['dsize'])) {
-			echo "ca. " . $devi['davail'] . 'kb/' . $devi['dsize'] . "kb - Formated:";
-			$ddate = $devi['ddate'];
-			if ($ddate != 0xFFFFFFFF) echo "[" . gmdate("d.m.Y H:i:s", $ddate) . "]<br>";
-			else echo "(DATE ERROR)<br>";
-		} else echo "(NO DINFO)<br>";
+		if($typ>0){
+			echo "Disk available: ";
+			if (isset($devi['dsize'])) {
+				echo "ca. " . $devi['davail'] . 'kb/' . $devi['dsize'] . "kb - Formated:";
+				$ddate = $devi['ddate'];
+				if ($ddate != 0xFFFFFFFF) echo "[" . gmdate("d.m.Y H:i:s", $ddate) . "]<br>";
+				else echo "(DATE ERROR)<br>";
+			} else echo "(NO DINFO)<br>";
+		}
 	}
 
 
@@ -243,23 +251,25 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 
 
 	echo "<br><b>Files on Device:</b>";
-	if (!empty($devi['dirtime'])) { // Generated after 1.st contact
-		$dt = $now - $devi['dirtime']; // merken
-		if (!$demo) echo " (last Directory Scan " . secs2period($dt) . " ago)";
-	} else {
-		if (!$demo) echo " (no Directory Scan)";
-	}
-
-	if (!$demo) {
-		if (@file_exists("$dpath/cmd/getdir.cmd")) {
-			echo " <a href=\"unlink_lx.php?s=$mac&f=cmd/getdir.cmd\">[Remove GET DIR]</a>";
-			$getdircmd = 1;
+	if($typ>0){
+		if (!empty($devi['dirtime'])) { // Generated after 1.st contact
+			$dt = $now - $devi['dirtime']; // merken
+			if (!$demo) echo " (last Directory Scan " . secs2period($dt) . " ago)";
 		} else {
-			echo " <a href=\"setcmd_lx.php?s=$mac&f=cmd/getdir.cmd&l=4\">[GET DIR]</a>";
-			$getdircmd = 0;
+			if (!$demo) echo " (no Directory Scan)";
+		}
+		if (!$demo) {
+			if (@file_exists("$dpath/cmd/getdir.cmd")) {
+				echo " <a href=\"unlink_lx.php?s=$mac&f=cmd/getdir.cmd\">[Remove GET DIR]</a>";
+				$getdircmd = 1;
+			} else {
+				echo " <a href=\"setcmd_lx.php?s=$mac&f=cmd/getdir.cmd&l=4\">[GET DIR]</a>";
+				$getdircmd = 0;
+			}
 		}
 	}
 	echo "<br>";
+
 	$flist = scandir("$dpath/cmd"); // Sorted
 	foreach ($flist as  $fmeta) {
 		$pos = strrpos($fmeta, '.');
@@ -492,25 +502,27 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			echo "<a href=\"view.php?s=$mac&f=_userio_old.txt\">Old User Commands '_userio_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		}
 
-		echo "<br><a href=\"fw_upload_form.php?s=$mac\">Upload new Firmware File</a><br>";
-
-		if (!empty($fwinfo['cookie'])) echo "<a href=\"unlink_lx.php?s=$mac&f=cmd/_firmware.sec.umeta\">Delete Firmware File</a><br>"; // Attention, not safe
-		echo "<br><a href=\"files_upload_form.php?s=$mac\">Upload Files to Device's Filesystem</a><br>";
-
+		echo '<br>';
+		if($typ>0){
+			echo "<a href=\"fw_upload_form.php?s=$mac\">Upload new Firmware File</a><br>";
+			if (!empty($fwinfo['cookie'])) echo "<a href=\"unlink_lx.php?s=$mac&f=cmd/_firmware.sec.umeta\">Delete Firmware File</a><br>"; // Attention, not safe
+			echo "<a href=\"files_upload_form.php?s=$mac\">Upload Files to Device's Filesystem</a><br>";
+			echo "<a href=\"server_cmd_form.php?s=$mac\">Send Server Command (Byte)</a>";
+			if (@file_exists(S_DATA . "/$mac/cmd/server.cmd")) {
+				$server_cmd = file_get_contents(S_DATA . "/$mac/cmd/server.cmd");
+				$scmd_val = ord($server_cm[0]);
+				echo " (Pending: '$scmd_val' ";
+				echo " <a href=\"unlink_lx.php?s=$mac&f=cmd/server.cmd\">[Remove]</a> )";
+			}
+			echo '<br>';
+		}
 		echo "<a href=\"user_cmd_form.php?s=$mac\">Send User Command (Text)</a>";
 		if (@file_exists(S_DATA . "/$mac/cmd/usercmd.cmd")) {
 			$user_cmd = file_get_contents(S_DATA . "/$mac/cmd/usercmd.cmd");
 			echo " (Pending: '" . htmlspecialchars($user_cmd) . "' ";
 			echo " <a href=\"unlink_lx.php?s=$mac&f=cmd/usercmd.cmd\">[Remove]</a> )";
 		}
-		echo "<br>";
-		echo "<a href=\"server_cmd_form.php?s=$mac\">Send Server Command (Byte)</a>";
-		if (@file_exists(S_DATA . "/$mac/cmd/server.cmd")) {
-			$server_cmd = file_get_contents(S_DATA . "/$mac/cmd/server.cmd");
-			$scmd_val = ord($server_cm[0]);
-			echo " (Pending: '$scmd_val' ";
-			echo " <a href=\"unlink_lx.php?s=$mac&f=cmd/server.cmd\">[Remove]</a> )";
-		}
+		echo '<br>';
 
 		if (@file_exists(S_DATA . "/$mac/cmd/dbg.cmd")) {
 			echo "<br><b>***Debug enabled:***</b><br>";

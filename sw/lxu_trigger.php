@@ -1,14 +1,11 @@
 <?php
 /*************************************************************
- * trigger for LTrax V1.16-LEGACY
+ * trigger for LTrax V1.20-LEGACY
  *
- * 06.12.2020
+ * 03.12.2022
  * This is one version for a trigger that accepts all incomming data, but nothing else!
  * Can be triggered externally, see docu..
  * Last used Err: 106
- * 8/2020: With Quota-Limit
-	 ToDo:
- * CRON
  ***************************************************************/
 
 error_reporting(E_ALL);
@@ -132,6 +129,14 @@ foreach ($flist as $fname) {
 	}
 
 	$unixt = 0; // Start with unix-Time unknown
+	foreach ($lines as $line) { // Find 1.st time 
+		if ($line[0] != '!') continue;
+		$ht=intval(substr($line, 1));
+		if ($ht > 1526030617 && $ht < 0xF0000000){
+				$unixt=$ht; 
+				break;
+		}
+	}
 
 	foreach ($lines as $line) {
 		if ($line[0] == '!') {
@@ -153,7 +158,7 @@ foreach ($flist as $fname) {
 				} else {
 					$unixt = intval(substr($tmp[0], 1));
 				}
-				if ($unixt < 1526030617 || $unixt >= 0x7FFFFFFF) {
+				if ($unixt < 1526030617 || $unixt >= 0xF0000000) {  // 2097
 					$warn_new++;	// Warning: Strange Times
 					if (strlen($xlog) < 128) $xlog .= "(WARNING: Unknown Time)";
 					if (count($info_wea) < 20) $info_wea[] = "WARNING: Unknown Time";
