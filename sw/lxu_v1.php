@@ -1,6 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 22.10.2022 - V1.22 joembedded@gmail.com  - JoEmbedded.de
+// (C) 05.12.2022 - V1.30 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
 // *TODO* Achtung: PHP8 meckert u.a. null als String-Argument deprecated an. *TODO*
@@ -14,19 +14,19 @@ include("lxu_loglib.php");
 function r4u_data($dix)
 {
 	global $data;
-	return unpack("N",$data,$dix)[1]; // U32
+	return unpack("N", $data, $dix)[1]; // U32
 }
 // ----- reads u16 from $data  BE -----   16Bit.u from String
 function r2u_data($dix)
 {
 	global $data;
-	return unpack("n",$data,$dix)[1]; // U16
+	return unpack("n", $data, $dix)[1]; // U16
 }
 // ------ u32 to string BE ----
 function str_u32($uv32)
 {
 	global $data;
-	return pack("N",$uv32);
+	return pack("N", $uv32);
 }
 
 // ------- Debug function: Show HEX contents of a string -----
@@ -48,7 +48,10 @@ function trigger($reason)
 
 	$self = $_SERVER['PHP_SELF'];
 	$port = $_SERVER['SERVER_PORT'];
-	$server = $_SERVER['SERVER_NAME'];
+	$isHttps =  (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')  || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
+	if ($isHttps) $server = "https://";
+	else $server = "http://";
+	$server .= $_SERVER['SERVER_NAME'];
 	$rpos = strrpos($self, '/'); // Evtl. check for  backslash (only Windows?)
 	$tscript = substr($self, 0, $rpos) . "/lxu_trigger.php";
 	$arg = "k=" . S_API_KEY . "&r=$reason&s=$mac";	// Parameter: API-KEY, reason and MAC
@@ -59,33 +62,21 @@ function trigger($reason)
 	$xlog = "";
 
 	if ($dbg > 1) {
-		echo "Start Trigger $server:$port '$tscript?$arg'\n";
+		echo "Start Trigger '$server:$port/$tscript?$arg'\n";
 	}
 
-	if ($dbg) $xlog = "(Trigger: $server:$port '$tscript?$arg')";
-	$fp = @fsockopen($server, $port, $errno, $errstr, 10);    // Try max. 10 seconds 
-	if ($fp) {
-		stream_set_timeout($fp, 0, 990000); // Wait max. 990 msec for a response of trigger
+	if ($dbg) $xlog = "(Trigger: '$server:$port/$tscript?$arg')";
 
-		$out = "GET $tscript?$arg HTTP/1.0\r\n";
-		$out .= "Host: $server:$port\r\n"; // Assume: Same dir as self
-		$out .= "Connection: Close\r\n\r\n";
-
-		$wres = fwrite($fp, $out);
-		if ($wres != strlen($out)) {
-			$xlog .= "(ERROR; Write to Trigger-Script failed)";
-		} else {
-			$rres = fread($fp, 1000);	// Only interested in the first few chars "HTTP/1.1 200 OK" or "HTTP/1.1 404 Not Found";
-			if (strpos($rres, " 200 ") != false) {
-				// $xlog.="(Trigger-Script OK '$rres')"; // Norm. not necessary to record
-			} else if (strpos($rres, " 404 ") != false) { // Normally: Busy Trigger takes longer..
-				$xlog .= "(ERROR: Trigger-Script not found)";
-			}  // Syntax-Erros in Script not catched!
-		}
-		fclose($fp);
-	} else {
-		$xlog .= "(ERROR: Trigger-Script open)";
-	}
+	$ch = curl_init("$server:$port/$tscript?$arg");
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+	if ($dbg) {
+		$res = curl_exec($ch);	// Might be very long!
+		$xlog .= "(Curl Result:\nSTART=====>\n$res\n<=====END)";
+	} else curl_exec($ch);
+	if (curl_errno($ch)) $xlog .= '(ERROR: Curl:' . curl_error($ch) . ')';
+	curl_close($ch);
 
 	if (strlen($xlog)) {
 		add_logfile();	// If triger fails: Add ne line to logfile
@@ -275,8 +266,8 @@ for (;;) {
 			$fdate = r4u_data($bp0 + 9);
 			$fnlen = ord($data[$bp0 + 13]);
 			$fname = substr($data, $bp0 + 14, $fnlen); // fname on Device
-			if (!strcasecmp(substr($fname, strrpos($fname, '.')), ".php")) $fname.='_'; 
-			
+			if (!strcasecmp(substr($fname, strrpos($fname, '.')), ".php")) $fname .= '_';
+
 			if ($dbg) fwrite($of, "A3: FILE:$fname, Len:$flen, Date:$fdate, F:$fflags CRC:" . dechex($fcrc) . "\n");
 
 			// Save to VDISK-Data
@@ -337,7 +328,7 @@ for (;;) {
 			$fflags = ord($data[$bp0 + 8]);
 			$fnlen = ord($data[$bp0 + 9]);
 			$fname = substr($data, $bp0 + 10, $fnlen);	// extract name
-			if (!strcasecmp(substr($fname, strrpos($fname, '.')), ".php")) $fname.='_'; // 
+			if (!strcasecmp(substr($fname, strrpos($fname, '.')), ".php")) $fname .= '_'; // 
 
 			$flen = $len - $fnlen - 10; // Only len of this block!
 			if ($dbg) fwrite($of, "A4: FILE $fname Pos0:$fpos0, Len:$flen, Date:$fdate, F:$fflags (uploaded)\n");
@@ -436,8 +427,8 @@ for (;;) {
 			fclose($of2);
 			$devi['lut_cont'] = $user_content;
 			$devi['lut_date'] = $now;
-			file_put_contents("$dpath/userio.txt",gmdate("d.m.y H:i:s", $now)." UTC Reply: '$user_content'\n",FILE_APPEND);
-			file_put_contents("$dpath/in_new/".gmdate("Ymd_His", $now)."_userio.edt","<UCMD:$user_content>"); // edt: DirectWay...
+			file_put_contents("$dpath/userio.txt", gmdate("d.m.y H:i:s", $now) . " UTC Reply: '$user_content'\n", FILE_APPEND);
+			file_put_contents("$dpath/in_new/" . gmdate("Ymd_His", $now) . "_userio.edt", "<UCMD:$user_content>"); // edt: DirectWay...
 			break;
 		case 0xA7: 	// ICCID (String)
 			$imsi = trim(substr($data, $bp0, $len));
@@ -689,8 +680,8 @@ if ($send_cmd <= 0) {
 				}
 				// Write PUT Data file with CRC32
 				$pflags = 22;	// 22 WRITE|CREATE|CRC - Standard
-				if(!strcmp($putfn,"iparam.lxp")) $pflags |= 64; // Exception: 'iparam.lxp' always synced!
-				$payload = chr($pflags) . chr(strlen($putfn)) . $putfn . file_get_contents("$dpath/put/$putfn");	
+				if (!strcmp($putfn, "iparam.lxp")) $pflags |= 64; // Exception: 'iparam.lxp' always synced!
+				$payload = chr($pflags) . chr(strlen($putfn)) . $putfn . file_get_contents("$dpath/put/$putfn");
 				$tecmd = "\xC1" . str_u32(strlen($payload)) . $payload; // Blocklen ist 5+datalen+4_crclen $C1: Download
 				$ecmd .= $tecmd . str_u32((~crc32($tecmd)) & 0xFFFFFFFF); // Append CRC
 
@@ -726,21 +717,21 @@ if ($send_cmd <= 0) {
 		@$cinfo['sent']++;
 		for (;;) { // loop only for flow
 			if ($cinfo['sent'] > 1) {
-				$cres="";
+				$cres = "";
 				if (($cinfo['now'] == $devi['con_id']) && ($cinfo['stage'] + 1 == $stage)) {
 					$xlog .= "(User Command '$ucmd' confirmed)";
 					@unlink("$dpath/cmd/usercmd.cmd");
 					@unlink("$dpath/cmd/usercmd.cmeta");
 					$cres = "Confirmed";
-				}else if ($cinfo['sent'] > 4) {
+				} else if ($cinfo['sent'] > 4) {
 					$xlog .= "(ERROR: User Command '$ucmd' send failed)";
 					$cres = "Send failed";
 				}
-				if(strlen($cres)){
+				if (strlen($cres)) {
 					@unlink("$dpath/cmd/usercmd.cmd");
 					@unlink("$dpath/cmd/usercmd.cmeta");
 					$devi['luc_state'] = $cres;
-					file_put_contents("$dpath/userio.txt",gmdate("d.m.y H:i:s", $now)." UTC $cres: '$ucmd' \n",FILE_APPEND);
+					file_put_contents("$dpath/userio.txt", gmdate("d.m.y H:i:s", $now) . " UTC $cres: '$ucmd' \n", FILE_APPEND);
 					break;
 				}
 			}

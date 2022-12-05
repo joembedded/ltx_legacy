@@ -1,6 +1,6 @@
 <?php
 // Convert HTML to File and upload
-// V1.0 (C) JoEmbedded 
+// V1.1 (C) JoEmbedded 
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -35,17 +35,6 @@ function show_str($rem, $str)
 	echo "\n";
 }
 
-function u32l_str($uvs)
-{ // le
-	$ret = ord($uvs[0]) + (ord($uvs[1]) << 8) + (ord($uvs[2]) << 16) + (ord($uvs[3]) << 24);
-	return $ret;
-}
-function str_u32l($uv32)
-{ // le
-	$ret = chr($uv32) . chr($uv32 >> 8) . chr($uv32 >> 16) . chr($uv32 >> 24);
-	return $ret;
-}
-
 
 //---------------- MAIN ---------------
 header('Content-Type: text/plain');
@@ -54,6 +43,7 @@ $dbg = 0;	// Currently not used
 $mac = @$_POST['mac']; // 16 Chars, Uppercase
 $freal_name = @$_POST['fname'];
 $lines = @$_POST['lines'];
+
 $now = time(); // Sec ab 1.1.1970, GMT
 
 if ($dbg) print_r($_POST);
@@ -80,7 +70,7 @@ $xlog = "(Edited and Upload File:'$freal_name')";
 $binfile = "";
 for ($i = 0; $i < $lines; $i++) {
 	$val = $_POST["z$i"];
-	$binfile .= $val . "\n";
+	$binfile .=  $val . "\n";
 }
 //echo $binfile; // Show Output
 
@@ -97,6 +87,5 @@ $of = fopen($dpath . "/cmd/$freal_name.pmeta", 'w');	// Keep some fmeta data
 fwrite($of, "sent\t0\n");					// Count Number of transmits
 fclose($of);
 // Add to protocol
-
 echo "OK, File prepared for Upload ('put') (Back with Browser '<-')\n";
 add_logfile(); // Regular exit

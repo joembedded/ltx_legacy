@@ -1,9 +1,9 @@
 <?php
-// FILE: lxu_loglib.php  - Version:26.11.2022
+// FILE: lxu_loglib.php  - Version:04.12.2022
 // include-module logfile only for LXU modules (path on 1.st level)!
 
 // ---- basic directory service ---
-function check_dirs()
+function check_dirs($wcmd = true)
 {
 	global $xlog, $dbg, $mac;
 	$sdata = S_DATA;
@@ -19,7 +19,7 @@ function check_dirs()
 		mkdir($sdata . "/$mac");
 		file_put_contents($sdata . "/$mac/date0.dat", time()); // Note initial date
 		file_put_contents($sdata . "/$mac/quota_days.dat", DB_QUOTA); 
-		$newdev = true;
+		$newdev = $wcmd;
 	}
 	if (!file_exists($sdata . "/$mac/cmd")) {
 		mkdir($sdata . "/$mac/cmd");
