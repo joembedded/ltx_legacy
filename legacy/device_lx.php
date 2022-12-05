@@ -30,7 +30,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 27.11.2022
+	// Version: 05.12.2022
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
 	// todo: Cross-Site-Scripting irgendwo?
@@ -86,17 +86,15 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			// echo "Line: $line<br>";
 		}
 	}
-	$typ=intval(@$devi['typ']); // >0: Logger
+	$pasync = intval(@$devi['pasync']); // >0: Ayynchron with packets
 	//--- Show avilabale infos ---
 	echo "</p><p><b>Device Info:</b><br>";
 
-	if($typ>0){
-		echo "Name: ";
-		$iparam_info =  @file(S_DATA . "/$dpath/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
-		if (@isset($iparam_info[5])) echo "'<b>".htmlspecialchars($iparam_info[5])."</b>'";
-		else echo "(NO 'iparam.lxp')";
-		echo "<br>";
-	}
+	echo "Name: ";
+	$iparam_info =  @file(S_DATA . "/$dpath/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
+	if (@isset($iparam_info[5])) echo "'<b>" . htmlspecialchars($iparam_info[5]) . "</b>'";
+	else echo "(NO 'iparam.lxp')";
+	echo "<br>";
 
 	$user_info = @file("$dpath/user_info.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 	if (@$user_info[0]) echo "Legacy Name: '<b>" . htmlspecialchars($user_info[0]) . "</b>'";
@@ -121,7 +119,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		case 3:
 			echo "MANUAL";
 			break;
-		// case 4:	echo "SMS";	break;
+			// case 4:	echo "SMS";	break;
 		default:
 			echo "UNKNOWN(reason=$reason)";
 			break;	// Alarm e.g. t.b.d
@@ -135,11 +133,12 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo "<b>WARNING: Last Transfer pending or incomplete</b><br>";
 	}
 
-	if($typ>0){
+	if (!$pasync) {
 		$dt = $devi['sdelta'];  // $devi['dtime']-$devi['now']; different for long transfers
 		echo "Deviation to Server: $dt secs<br>";
-		echo "Transmission Count (All/OK): " . $devi['conns'] . '/' . @$devi['trans'] . '<br>';
 	}
+
+	echo "Transmission Count (All/OK): " . $devi['conns'] . '/' . @$devi['trans'] . '<br>';
 
 	if (@strlen(DB_NAME)) {
 		$quota = @file("$dpath/quota_days.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -160,7 +159,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo " - Total (In/Out): " . (@$devi['quota_in'] + @$devi['total_in']) . '/' . (@$devi['quota_out'] + @$devi['total_out']);
 		echo " Since: [" . gmdate("d.m.Y H:i:s", @file_get_contents("$dpath/date0.dat")) . "](UTC)<br>"; // filectime() scheint sich fuer DIRs zu aendern..
 
-		if($typ>0){
+		if (!$pasync) {
 			echo "Device Firmware ";
 			if (!empty($devi['fw_ver'])) echo "Version: V" . ($devi['fw_ver'] / 10);
 			else echo "(unknown)";
@@ -194,13 +193,13 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			} else {
 				echo "(No Firmware Bin-File)<br>";
 			}
-		}else{
-			echo "Device Type: ".$devi['typ'] . "<br>";
+		} else {
+			echo "Device Type: " . $devi['typ'] . " (No Disk)<br>";
 		}
 	}
 
 	if (!$demo) {
-		if($typ>0){
+		if (!$pasync) {
 			echo "Disk available: ";
 			if (isset($devi['dsize'])) {
 				echo "ca. " . $devi['davail'] . 'kb/' . $devi['dsize'] . "kb - Formated:";
@@ -250,8 +249,8 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	$delfilecmd = 0;
 
 
-	echo "<br><b>Files on Device:</b>";
-	if($typ>0){
+	if (!$pasync) {
+		echo "<br><b>Files on Device:</b>";
 		if (!empty($devi['dirtime'])) { // Generated after 1.st contact
 			$dt = $now - $devi['dirtime']; // merken
 			if (!$demo) echo " (last Directory Scan " . secs2period($dt) . " ago)";
@@ -267,6 +266,8 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 				$getdircmd = 0;
 			}
 		}
+	} else {
+		echo "<br><b>Files: (local)</b>";
 	}
 	echo "<br>";
 
@@ -354,8 +355,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 				echo "<a href=\"gps_view.php?s=$mac&f=$fname\" title=\"View as GPS (Map)\">[GPSVIEW]</a> ";
 			} else {
 				if (!$demo) {
-					if (strpos($fname, '.jpg') > 0 || strpos($fname, '.jpeg') > 0);
-					else echo " <a href=\"edit_lxp.php?s=$mac&f=files/$fname\" title=\"Edit raw content of File as Text\">[Edit]</a> ";
+					if (strpos($fname, '.lxp') > 0) echo " <a href=\"edit_lxp.php?s=$mac&f=files/$fname\" title=\"Edit raw content of File as Text\">[Edit]</a> ";
 				}
 			}
 		}
@@ -390,14 +390,19 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	// Now list other files
 	foreach ($phflist as $phfname) {
 		if (!strlen($phfname) || !strcmp($phfname, ".") || !strcmp($phfname, "..")) continue;
-		echo "( '$phfname': " . filesize("$dpath/files/$phfname") . " Bytes (Backup)))";
+
+		if (!$pasync) echo "( '$phfname': " . filesize("$dpath/files/$phfname") . " Bytes (Backup)))";
+		else echo "$phfname': " . filesize("$dpath/files/$phfname") . " Bytes &nbsp; ";
 		echo " <a href=\"view.php?s=$mac&f=files/$phfname\" title=\"View raw content of File as Text\">[Open local]</a> ";
 		// Check Extensions: EDT .EasyDaTa
+
 		if (strpos($phfname, '.edt')) {
 			echo "<a href=\"edt_view.php?s=$mac&f=$phfname\" title=\"View as CSV (Text)\">[View CSV]</a> ";
 			echo "<a href=\"edt_view.php?s=$mac&f=$phfname&o=135\" title=\"Download as CSV, Float Format: German\">[CSV(D)]</a> ";
 			echo "<a href=\"edt_view.php?s=$mac&f=$phfname&o=131\" title=\"Download as CSV, Float Format: International\">[CSV(Int)]</a> ";
 			echo "<a href=\"csview/csview.php?s=$mac&f=$phfname\" title=\"Graphical View Online\">[CSVIEW]</a>";
+		} else if ($pasync && strpos($phfname, '.lxp') > 0) {
+			echo " <a href=\"edit_lxp.php?s=$mac&f=files/$phfname\" title=\"Edit raw content of File as Text\">[Edit]</a> ";
 		}
 		if (!$demo) echo "&nbsp;&nbsp;<a href=\"unlink_lx.php?s=$mac&f=files/$phfname\">[DEL]</a>)"; // 4 tries
 		echo "<br>";
@@ -442,7 +447,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	if (!$demo) {
 
 		echo "</p><p><b>Manage:</b><br>";
-		if(strlen(KEY_API_GL) && strlen(KEY_SERVER_URL)){
+		if (strlen(KEY_API_GL) && strlen(KEY_SERVER_URL)) {
 			echo "<a target='_blank' href='gen_key_badge.php?s=$mac'>Generate Key Badge</a><br><br>";
 		}
 
@@ -503,7 +508,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		}
 
 		echo '<br>';
-		if($typ>0){
+		if (!$pasync) {
 			echo "<a href=\"fw_upload_form.php?s=$mac\">Upload new Firmware File</a><br>";
 			if (!empty($fwinfo['cookie'])) echo "<a href=\"unlink_lx.php?s=$mac&f=cmd/_firmware.sec.umeta\">Delete Firmware File</a><br>"; // Attention, not safe
 			echo "<a href=\"files_upload_form.php?s=$mac\">Upload Files to Device's Filesystem</a><br>";

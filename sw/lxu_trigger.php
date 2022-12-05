@@ -2,10 +2,13 @@
 /*************************************************************
  * trigger for LTrax V1.20-LEGACY
  *
- * 03.12.2022
- * This is one version for a trigger that accepts all incomming data, but nothing else!
- * Can be triggered externally, see docu..
- * Last used Err: 106
+ * 05.12.2022 - (C)JoEmbedded.com
+ *
+ * This is non-database version for a trigger that accepts 
+ * all incomming data, but nothing else!
+ * Can/will be triggered externally, see docu.
+ * By default all incomming data will be simply accumulated to 
+ * a file '..$mac/out_total/total.edt'
  ***************************************************************/
 
 error_reporting(E_ALL);
@@ -131,10 +134,10 @@ foreach ($flist as $fname) {
 	$unixt = 0; // Start with unix-Time unknown
 	foreach ($lines as $line) { // Find 1.st time 
 		if ($line[0] != '!') continue;
-		$ht=intval(substr($line, 1));
-		if ($ht > 1526030617 && $ht < 0xF0000000){
-				$unixt=$ht; 
-				break;
+		$ht = intval(substr($line, 1));
+		if ($ht > 1526030617 && $ht < 0xF0000000) {
+			$unixt = $ht;
+			break;
 		}
 	}
 
