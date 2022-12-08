@@ -1,0 +1,55 @@
+*** LICENSE.TXT ****
+
+*
+* LTX_Server and LTX_Legay  - License Agreement
+* ============================================
+*
+* Read the following text carefully! 
+*
+* If you disagree in any of the following items,
+* installation and use of this software is not 
+* permitted!
+*
+
+- Copyright
+
+This Software is published under CC BY-NC-SA 4.0
+https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
+In short: free for non-commercial use.
+For commercial use, please contact us!
+
+- Disclaimer
+
+If you disagree in any of the following items, installation 
+and use of this software is not permitted!
+
+- Errors
+
+This software and hardware has been carefully developed and 
+tested. But it is a well known fact, that at the contemporary
+state of technology, it is not possible to guarantee that a 
+product is completely free of errors. For that reason we 
+decline any liability, loss, or damage caused directly or 
+indirectly by our software and/or use of our hardware. 
+The use is at your own risk.
+
+- Trademarks
+
+All terms mentioned in this software and the complementary 
+documentation that are known to be trademarks or service 
+marks have been appropriate marked. But we can not attest 
+the accuracy of this information. Use of a term should not 
+be regarded as affecting the validity of any trademark or 
+service mark.
+
+- Internet
+
+All references to Internet addresses are given by best 
+knowledge. However, we want to emphasise  particularly 
+that the contents of those addresses usually are beyond 
+our influence. Therefor we dissociate us explicitly from 
+any referenced contents, if they are an offence against 
+any current laws.
+
+*END*
+
