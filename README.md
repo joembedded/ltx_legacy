@@ -1,11 +1,11 @@
-# LTX LTraX Server Software **LEGACY** #
+# LTX Microcloud **LEGACY** #
 **LEGACY ('TextOnly') Version**
 
 __This is a reduced version of LTX Server, only using PHP and the Server's Filesystem to communicate with LTX LTraX Loggers__
 
-LTX can be installed WITH (named as "LTX_server") Database and WITHOUT (named as "LTX_legacy").
+LTX can be installed WITH (named as "LTX_Server") Database and WITHOUT (named as "LTX_Legacy").
 
-In case of "LTX_legacy" all data will be sent to directories and ALL device's new data will
+In case of "LTX_Legacy" all data will be sent to directories and ALL device's new data will
 be added to a file '.../out_total/total.edt' for the device. This file is simple text ('EDT'-Format) 
 and might become quite large over time ;-)
 
@@ -13,7 +13,7 @@ Some very simple scripts allow rudimentary access to all devices/loggers functio
 
 The input script '../sw/ltu_trigger.php' will add the data (feel free to modify it for your own requirements)
 
-## Important: This repository ('ltx_legacy') is automatically generated/maintained by scripts! No Feedback to Issues/Request/Comments ##
+## Important: This repository ('LTX_Legacy') is automatically generated/maintained by scripts! No Feedback to Issues/Request/Comments ##
 
 ***Installation:*** 
 
@@ -31,13 +31,12 @@ The input script '../sw/ltu_trigger.php' will add the data (feel free to modify 
  (Hint: for fast access bookmark it like this: https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY)
 
 
-_(Just as Info: In case of "LTX_server" all new data will be written to the database. There is a quota limit in
+_(Just as Info: In case of "LTX_Server" all new data will be written to the database. There is a quota limit in
 './sw/conf/api_key.inc.php' ("DB_QUOTA" with default "3650\n100000000"). A file 'quota_days.dat' with 2 lines
 will automatically be written for each new logger, 1.st line are days (here 3650), 2.nd line is lines (in the database).
 The input script 'sw\ltu_trigger.php' will automatically remove older data.
 Change e.g. to "90\n1000" to allow only the last 90 days or max. 1000 lines per device (so even a small DB can hold thousands of devices).
 The file 'quota_days.dat' my be set to individual values per logger at any time. )_
-
 
 _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Key for the device via external 'KEY_SERVER_URL' is requred)_
 
@@ -48,4 +47,5 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V1.01 06.12.2020 Checked for PHP8 compatibility
 - V1.10 09.01.2021 More Docs added
 - V1.11 16.03.2022 More Docs added
+- V1.50 08.12.2022 SWARM Packet driver added
 
