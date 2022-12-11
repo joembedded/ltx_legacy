@@ -1,13 +1,13 @@
 <?php
 /* lxswarm_v1.php Server-Communication Script for LTrax via SWARM Leo Satellites. Details: see docu
 * This is a Webhook
-* (C) 05.12.2022 - V1.20 joembedded@gmail.com  - JoEmbedded.de
+* (C) 11.12.2022 - V1.22 joembedded@gmail.com  - JoEmbedded.de
 *
 * SWARM has 'F000..' as MAC-Trailer!
 *
 * Setup in SWARM Hive:
 * 1. URL: https://joembedded.de/ltx/sw/lxswarm_v1.php
-* 2. Headers:   mailto 	e.g. joembedded@gmail.com  AND apikey D_API_KEY!
+* 2. Headers:   apikey D_API_KEY!
 * Will allow to Auto-generate device!
 *
 * if $dbg>0: Allow simulated Payload, e.g.
@@ -15,7 +15,6 @@
 *   gAACY4pnUwZBTwrmQAPUa0IHfLBAAAAAAAAAAEDA9cJaDjdbAAA=
 *
 * *todo* 
-* - Data may arrive NOT in logical order! Use 'line_ts','id' as sort ORDER for SELECT
 * - Linearise/Alarms
 */
 
@@ -283,13 +282,6 @@ $dfn = gmdate("Ymd_His", $now);		// 'disk_filename_from_now' (sortable)
 
 $headers = apache_request_headers();
 
-// If not debug META infos required!
-if (isset($headers['Mailto'])) $mailto = $headers['Mailto']; // optional Auto-Capitals
-else if (isset($headers['mailto'])) $mailto = $headers['mailto'];
-if (!$dbg && (!isset($mailto) || !filter_var($mailto, FILTER_VALIDATE_EMAIL))) {
-	if (!isset($mailto)) exit_error("Header 'mailto' required");
-	exit_error("'$mailto': Invalid email format");
-}
 if (isset($headers['Apikey'])) $api_key = $headers['Apikey']; // optional Auto-Capitals
 else if (isset($headers['apikey'])) $api_key = $headers['apikey'];
 if (!$dbg && (!isset($api_key) || strcmp($api_key, D_API_KEY))) {
@@ -311,7 +303,7 @@ $data = base64_decode($args['data']); // decode Payload, SWARM: max 192 U.8
 $maxlen = strlen($data);
 if ($maxlen < 1) exit_error("Empty Data");	// 16 is minimum
 
-if (!isset($args['deviceId'])) xdie("No JSON 'deviceId'");
+if (!isset($args['deviceId'])) exit_error("No JSON 'deviceId'");
 
 $mac =  'F' . str_pad(strtoupper(dechex($args['deviceId'])), 15, '0', STR_PAD_LEFT);	// SWARM exactly 'F'+15 Zeichen!
 if (strlen($mac) != 16) {
@@ -333,6 +325,11 @@ if ($dbg) {	// log all incomming data local and also txt
 $dpath = S_DATA . "/$mac";				// Device Path
 
 // Read 'device_info' - load infos about this device
+
+// Lock MAC until trigger finished! - Prevent receive several packets for this MAC same time
+$lockfile = fopen("$dpath/date0.dat",'r'); // Must exist
+while (!flock($lockfile, LOCK_EX)) usleep(10000);
+
 $devi = array();
 if (file_exists("$dpath/device_info.dat")) {
 	$lines = file("$dpath/device_info.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -450,4 +447,7 @@ add_logfile(); // Regular exit, entry in logfile should be first
 if ($dbg) echo "xlog: '$xlog'\n";
 trigger($devi['reason']);	// If trigger fails: New entry in logfile
 echo "OK";
+
+// UnLock MAC
+fclose($lockfile); 
 //***
