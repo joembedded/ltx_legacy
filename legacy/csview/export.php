@@ -30,7 +30,7 @@ echo <<<ERR
 h2 {  font-weight:bold; background-color:#8af; font-size:14pt;  }
 </style></head>
 <body><h2><br>ERROR<br>&nbsp;</h2>
-(Script: '$_SERVER[SCRIPT_NAME]')<br><br>
+(Script: '$_SERVER[PHP_SELF]')<br><br>
 ERR;
           echo "Explanation: <b>'$e'</b>";
           echo "<hr></body></html>";
