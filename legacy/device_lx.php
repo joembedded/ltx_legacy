@@ -30,10 +30,11 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 05.12.2022
+	// Version: 21.01.2023
+	
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
-	// todo: Cross-Site-Scripting irgendwo?
+	if(!isset($self) || strlen($self)<4) echo "WARNING: 'PHP_SELF' not set<br>";
 
 	// Fkt. --- Convert to Zeitstring
 	function  secs2period($secs)
@@ -148,8 +149,11 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo " / Lines: ";
 		if (isset($quota[1])) echo $quota[1];
 		else echo "(Unknown)";
+		if (isset($quota[2])) echo ", Push: '".htmlspecialchars($quota[2])."'";
+		else echo ", Push: (NOT SET)";
+
 		if (!$demo) {
-			echo " <a href=\"edit_quota.php?s=$mac\">[Edit Quota ('quota_days.dat')]</a>";
+			echo " <a href=\"edit_quota.php?s=$mac\">[Edit Quota/Push ('quota_days.dat')]</a>";
 		}
 		echo "<br>";
 	}
