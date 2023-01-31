@@ -30,7 +30,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 21.01.2023
+	// Version: 29.01.2023
 	
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
@@ -468,6 +468,21 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		if ($ds > 0) {
 			$fa = secs2period($now - filemtime("$dpath/_log_old.txt"));
 			echo "<a href=\"view.php?s=$mac&f=_log_old.txt\" title=\"View old Logfile as Text\">Old Logfile '_log_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
+		}
+
+		$ds = @filesize("$dpath/pcplog.txt");
+		if ($ds > 0) {
+			$dt = $now - filemtime("$dpath/pcplog.txt");
+			$fa = secs2period($dt);
+
+			echo "<a href=\"view.php?s=$mac&f=pcplog.txt\" title=\"View PCP-Logfile as Text\">Logfile 'pcplog.txt'</a> ($ds Bytes, Age: $fa)<br>";
+		} else {
+			echo "PCP-Logfile 'pcplog.txt' (not found)<br>";
+		}
+		$ds = @filesize("$dpath/_pcplog_old.txt");
+		if ($ds > 0) {
+			$fa = secs2period($now - filemtime("$dpath/_pcplog_old.txt"));
+			echo "<a href=\"view.php?s=$mac&f=_pcplog_old.txt\" title=\"View old PCP-Logfile as Text\">Old Logfile '_pcplog_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		}
 
 		$ds = @filesize("$dpath/conn_log.txt");
