@@ -22,8 +22,8 @@ if (!strcmp($api_key, L_KEY)) {
 }
 echo "<!DOCTYPE HTML><html><head>";
 
-if ($dev) $title = "Legacy LTrax Server Develop-Login V0.21";
-else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.21";
+if ($dev) $title = "Legacy LTrax Server Develop-Login V0.50";
+else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.50";
 
 $self = $_SERVER['PHP_SELF']; // Periodisch alle 30 Sekunden  auffrischen
 echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
@@ -41,7 +41,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	// dev.php DevPortal Script for LTrax. Details: see docu
 	// Only for Low-Level Developer Access!!!
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// V0.21 / 22.01.2023
+	// V0.50 / 29.01.2023
 	// todo: --- maybe LOCK makes sense for several files
 	if(!isset($self) || strlen($self)<4) echo "WARNING: 'PHP_SELF' not set<br>";
 
@@ -168,9 +168,21 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 			$fa = secs2period($now - filemtime("$dpath/_log_old.txt"));
 			echo "<a href=\"view.php?s=log&f=_log_old.txt\">Old Main Logfile '_log_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		}
-		/*** Not enabled - same as for x3w 
-		echo "<a href=\"fw_upload_bulk_form.php\">Bulk Firmware Upload</a><br>";
-		 ***/
+		$ds = @filesize("$dpath/pcplog.txt");
+		if ($ds > 0) {
+			$dt = $now - filemtime("$dpath/pcplog.txt");
+			$fa = secs2period($dt);
+
+			echo "<a href=\"view.php?s=log&f=pcplog.txt\">Main PCP-Logfile 'pcplog.txt'</a> ($ds Bytes, Age: $fa)<br>";
+		} else {
+			echo "Main PCP-Logfile 'pcplog.txt' (not found)<br>";
+		}
+		$ds = @filesize("$dpath/_pcplog_old.txt");
+		if ($ds > 0) {
+			$fa = secs2period($now - filemtime("$dpath/_pcplog_old.txt"));
+			echo "<a href=\"view.php?s=log&f=_pcplog_old.txt\">Old Main PCP-Logfile '_pcplog_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
+		}
+
 		echo "<br>";
 
 		echo "<a href=\"browse.php\">Browse LTrax Files (Main Directory)</a> ";

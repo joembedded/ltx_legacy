@@ -42,7 +42,7 @@ if (!strcmp($api_key, L_KEY)) {
 	echo "<form name=\"uname_editform\"  action=\"./set_quota.php?s=$mac\" method=\"post\">";
 	echo "<label for=\"d\">Days (&ge;1): </label> <input id=\"d\" name=\"udays\" value=\"" . @$quota[0] . "\"><br>";
 	echo "<label for=\"l\">Lines (&ge;10): </label> <input id=\"l\" name=\"ulines\" value=\"" . @$quota[1] . "\"><br><br>";
-	echo "<label for=\"p\">Push (URL opt. plus ' ' plus Accesskey): </label> <input id=\"p\" name=\"upush\" value=\"" . @$quota[2] . "\"><br>";
+	echo "<label for=\"p\">Push (URL/'*' opt. plus ' ' plus Accesskey): </label> <input id=\"p\" size=\"100\" name=\"upush\" value=\"" . @$quota[2] . "\"><br>";
 	?>
 	<input type="Submit" name="UP">
 	</form>
