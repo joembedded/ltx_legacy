@@ -12,7 +12,7 @@ function check_dirs($wcmd = true)
 	// Data and LOG always required
 	if (!file_exists($sdata)) mkdir($sdata);  // MainDirectory
 	if (!file_exists($sdata . "/log")) mkdir($sdata . "/log");  // Logfiles
-	if(strlen($mac)!==16) return;	// No MAC
+	if(!isset($mac) || strlen($mac)!==16) return;	// No MAC
 
 	if (!file_exists($sdata . "/$mac")) {
 		// if(!$dbg) return -1;	// --- Without debug: dir must exist
