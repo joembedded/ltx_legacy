@@ -22,8 +22,8 @@ if (!strcmp($api_key, L_KEY)) {
 }
 echo "<!DOCTYPE HTML><html><head>";
 
-if ($dev) $title = "Legacy LTrax Server Develop-Login V0.50";
-else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.50";
+if ($dev) $title = "Legacy LTrax Server Develop-Login V0.52";
+else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.52";
 
 $self = $_SERVER['PHP_SELF']; // Periodisch alle 30 Sekunden  auffrischen
 echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
@@ -38,10 +38,11 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 
 <body>
 	<?php
+
 	// dev.php DevPortal Script for LTrax. Details: see docu
 	// Only for Low-Level Developer Access!!!
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// V0.50 / 29.01.2023
+	// V0.52 / 06.06.2023
 	// todo: --- maybe LOCK makes sense for several files
 	if(!isset($self) || strlen($self)<4) echo "WARNING: 'PHP_SELF' not set<br>";
 
@@ -58,8 +59,9 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	// ----------- M A I N ---------------
 	$mtmain_t0 = microtime(true);         // for Benchmark 
 	echo "<p><b><big>$title</big></b><br>";
-	//echo "<a href=\"..\sw\index.php\">LTrax Home</a><br>";
-	//echo "<a href=\"..\media\index.php\">LTrax Media Browser</a><br>";
+
+	if (!$dev) echo "<br><b><font color=\"red\">*** Guest Mode (Read-Only) ***</font></b>";
+
 	echo "</p>";
 	$dbg = 0;	// No Debug enabled
 
@@ -116,7 +118,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 			if ($bakg) $fage = "<span style='background-color:$bakg'> $fage </span>";
 		}
 		// Link to this device
-		echo "<a href=\"device_lx.php?s=$file\">$file</a>";
+		echo "<a href=\"device_lx.php?s=$file\" target='_blank'>$file</a>";
 
 		echo " (Name: ";
 		$iparam_info =  @file(S_DATA . "/$file/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
@@ -173,27 +175,30 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 			$dt = $now - filemtime("$dpath/pcplog.txt");
 			$fa = secs2period($dt);
 
-			echo "<a href=\"view.php?s=log&f=pcplog.txt\">Main PCP-Logfile 'pcplog.txt'</a> ($ds Bytes, Age: $fa)<br>";
+			echo "<a href=\"view.php?s=log&f=pcplog.txt\">Main Push-Pull-Logfile 'pcplog.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		} else {
 			echo "Main PCP-Logfile 'pcplog.txt' (not found)<br>";
 		}
 		$ds = @filesize("$dpath/_pcplog_old.txt");
 		if ($ds > 0) {
 			$fa = secs2period($now - filemtime("$dpath/_pcplog_old.txt"));
-			echo "<a href=\"view.php?s=log&f=_pcplog_old.txt\">Old Main PCP-Logfile '_pcplog_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
+			echo "<a href=\"view.php?s=log&f=_pcplog_old.txt\">Old Main Push-Pull-Logfile '_pcplog_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		}
 
-		echo "<br>";
+		if(@file_exists("../sw/service/index.php")){
+			echo "<br><a href=\"../sw/service/index.php\" target='_blank'>Service...</a>";
+		}
 
-		echo "<a href=\"browse.php\">Browse LTrax Files (Main Directory)</a> ";
+		echo "<br><a href=\"browse.php\" target='_blank'>Browse LTrax Files (Main Directory)</a> ";
 		if ($dbg) echo "<b>***Debug enabled ($dbg)***</b>";
-		echo "<br><a href=\"php_info.php\">PHP-Info</a><br>";
+		echo "<br><a href=\"php_info.php\" target='_blank'>PHP-Info</a><br>";
 	}
 	if (!$dev) {
 	?>
 		<br>
 		<form method="post" action="index.php">
-			Password ('L_KEY'): <input type="password" name="k"><input type="Submit" value="Login">
+			<!-- User (Legacy): --><input placeholder="Enter User" type="input" name="user" value="legacy" hidden>
+			<b>Password ('L_KEY'): </b><input placeholder="Enter Password" type="password" name="k"> 	<input type="Submit" value="Login">
 		</form>
 	<?php
 	} else {

@@ -30,7 +30,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 29.01.2023
+	// Version: 0.52 06.06.2023
 	
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
@@ -46,7 +46,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 
 	// ----------------- M A I N -------------------
 	$mtmain_t0 = microtime(true);         // for Benchmark 
-	$mac = @$_GET['s'];
+	$mac = @$_REQUEST['s'];
 	$now = time();
 
 	$dbg = 0;	// Biser noch ohne Fkt.
@@ -54,7 +54,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 
 	$dpath = S_DATA . "/$mac";
 
-	if (!strlen($mac)) {
+	if (!isset($mac)) {
 		echo "ERROR: MAC required";
 		exit();
 	}
@@ -556,6 +556,22 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			echo "<br>(Debug disabled) ";
 			echo "<a href=\"setcmd_lx.php?s=$mac&f=cmd/dbg.cmd\">[Enable DEBUG]</a><br>";
 		}
+	}
+	if ($demo) {
+	?>
+		<form method="post" action="device_lx.php?s=<?php echo $mac; ?>">
+			<!-- User (Legacy): --><input placeholder="Enter User" type="input" name="user" value="legacy" hidden>
+			<b>Password ('L_KEY'): </b><input placeholder="Enter Password" type="password" name="k"> 	<input type="Submit" value="Login">
+			
+		</form>
+	<?php
+	} else {
+	?>
+		<form method="post" action="device_lx.php?s=<?php echo $mac; ?>">
+			<input type="hidden" value="" name="k"> 
+			<input type="Submit" value="Logout">
+		</form>
+	<?php
 	}
 
 	$mtrun = round((microtime(true) - $mtmain_t0) * 1000, 4);
