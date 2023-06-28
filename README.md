@@ -51,4 +51,5 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V1.52 20.01.2023 ASTOROCAST Packet driver added
 - V1.60 21.01.2023 Push-URL added 
 - V1.76 06.06.2023 Access Legacy for Admin Users
+- V1.77 28.06.2023 Added sw/js/xtract_demo.html: demo to access BLE_API data in IndexDB
 
