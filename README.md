@@ -42,6 +42,11 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 
 ---
 
+## 3.rd Party Software ##
+- PHP QR Code https://sourceforge.net/projects/phpqrcode License: LGPL
+
+---
+
 ## Changelog ##
 - V1.00 04.12.2020 Initial
 - V1.01 06.12.2020 Checked for PHP8 compatibility
