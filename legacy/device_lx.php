@@ -30,7 +30,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 0.52 06.06.2023
+	// Version: 0.53 15.08.2023
 	
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
@@ -149,10 +149,9 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo " / Lines: ";
 		if (isset($quota[1])) echo $quota[1];
 		else echo "(Unknown)";
-		if (isset($quota[2])) echo ", Push: '".htmlspecialchars($quota[2])."'";
-		else echo ", Push: (NOT SET)";
-
 		if (!$demo) {
+			if (isset($quota[2])) echo ", Push: '".htmlspecialchars($quota[2])."'";
+			else echo ", Push: (NOT SET)";
 			echo " <a href=\"edit_quota.php?s=$mac\">[Edit Quota/Push ('quota_days.dat')]</a>";
 		}
 		echo "<br>";
