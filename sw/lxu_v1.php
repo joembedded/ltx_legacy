@@ -1,6 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 05.12.2022 - V1.30 joembedded@gmail.com  - JoEmbedded.de
+// (C) 13.09.2023 - V1.40 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
 // *TODO* Achtung: PHP8 meckert u.a. null als String-Argument deprecated an. *TODO*
@@ -133,6 +133,7 @@ $xlog = "($maxlen Bytes Data)";
 $dpath = S_DATA . "/$mac";				// Device Path
 $stage = -1;	// Assume Stage no stage for this communication
 $expmore = 0; // Asume no reply
+$extratxt = "";	// Added ASCII (Quectel-Cache-Prob)
 
 $idx = 0;		// Index in data
 $ecmd = "";	// echo-command
@@ -497,6 +498,7 @@ if ($send_cmd <= 0 && file_exists("$dpath/cmd/_firmware.sec.umeta")) { // Check 
 				$xlog .= "(New Firmware sent(" . $fwinfo['sent'] . "))"; // Cnt
 				$expmore = 1;		// Reply once after transfer
 				$send_cmd = 128;	// With RESET afterwards in first round
+				$extratxt = str_repeat("Stuff",1000); // 5k Dummy wg. Quectel-Problem
 
 				$of2 = fopen("$dpath/cmd/_firmware.sec.umeta", 'w');
 				foreach ($fwinfo as $key => $val) {
@@ -777,6 +779,7 @@ if ($send_cmd >= 0) { // preset to -1
 
 if ($expmore) $recmd = "\xFE:ServerRepeat**"; 	// Repeat
 else $recmd = "\xFF:ServerDone****"; // OK
+$ecmd .= $extratxt;
 $elen = strlen($ecmd);
 $aesgap = 16 - ($elen & 15); // Add 1..16 Bytes (but at least 1)
 $ecmd .= substr($recmd, 0, $aesgap); // prepare pption for HTTP-AES
