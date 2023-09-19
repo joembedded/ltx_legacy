@@ -1,7 +1,7 @@
 <?PHP
 // -------------------------------------------------------------------
 // edit.php - Edit datafile (and write back)
-// 04.12.2022 joembedded.de
+// 19.09.2023 joembedded.de
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -40,7 +40,7 @@ $p100_beschr = array(
 	"Net_Mode (0:Off 1:OnOff 2:On_5min 3:Online)",
 	"ErrorPolicy (O:None 1:RetriesForAlarms, 2:RetriesForAll)",
 	"MinTemp_oC[-40..10]",
-	"Period_Internet_Offset[0..Period_Internet_sec]",
+	"Config0_U31 (B0-B30)",
 );
 
 $pkan_beschr = array(
@@ -108,7 +108,7 @@ if (!strcasecmp($ext, ".php")) {
 	$cnt = count($data);
 	$rel = 0;
 	for ($i = 0; $i < $cnt; $i++) {
-		$var = $data[$i];
+		$var = $data[$i]; // 'undefined' JS-String
 		if (@$var[0] == '@') {
 			$pval = substr($var, 1);
 			if ($pval == 100) {
