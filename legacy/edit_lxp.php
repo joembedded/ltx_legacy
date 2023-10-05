@@ -41,6 +41,7 @@ $p100_beschr = array(
 	"ErrorPolicy (O:None 1:RetriesForAlarms, 2:RetriesForAll)",
 	"MinTemp_oC[-40..10]",
 	"Config0_U31 (B0-B30)",
+	"Configuration_Command[$79]",
 );
 
 $pkan_beschr = array(
