@@ -221,6 +221,9 @@ for (;;) {
 				case 3:
 					$rea_str = "(MANUAL";
 					break;
+				case 4:
+					$rea_str = "(START";
+					break;
 				default:
 					$rea_str = "(UNKNOWN(reason=$reason)";
 					break;	// Alarm e.g. t.b.d
