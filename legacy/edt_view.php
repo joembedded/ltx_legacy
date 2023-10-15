@@ -171,7 +171,7 @@ foreach ($data as $line) {
 	// Data Line. 
 	if ($shdr) {	// If necessary: Show CSV Header
 		if ($opt & NO_LINECNT) $oline .= "TIME(UTC)";	// Time Only
-		else $oline .= "NO, TIME";	// Standard
+		else $oline .= "NO, TIME(UTC)";	// Standard
 
 		foreach ($chan as $hdr => $htxt) {
 			if (strcmp($hdr, $htxt)) $oline .= ", $htxt($hdr)";	// Different Name
