@@ -1,13 +1,24 @@
 <?php
-/* ipush.php - intenal immerdiate push
+/* ipush.php - internal immerdiate push 
 	http://localhost/ltx/sw/vpnf/ipush.php?s=DDC2FB99207A7E7E&k=S_API_KEY
 	http://localhost/ltx/sw/w_php/w_pcp.php?s=DDC2FB99207A7E7E&k=S_API_KEY&cmd=getdata&minid=80
 
 	ConfCmd: PROTOCOL FORMAT STATIONID  URL PORT USER PW 
     Bsp:     FTPSSL CSV1 Bach123 s246.goserver.host 21 web28f3 qfile57
 
-	Format: CSV0: Mit ALLEM  CSV1: Nur Daten
-	Wird nur ausgefuehrt wenn 
+	Protocol:
+		FTP: unencrypted FTP (normally Port 21)
+		FTPSSL FTP with implicit encryption (normally Port 21)
+
+	Format: 
+		CSV0: All lines as CSV (including '<>' meta lines)
+		CSV1: Only data lines as CSV
+
+	StationId: 
+		String,1-8 characters, used as filename-prefix for upload 
+		(e.g. 'Bach123' writes files 'Bach123_20231015181223.txt')
+	
+	URL / PORT / USER: FTP credentials
 */
 
 error_reporting(E_ALL);
@@ -181,9 +192,8 @@ if ($prot !== false) {
 	}
 	$xlines = array($xhdr."\n");	// Exportierte Daten
 
-	$danz = $fdata->get_count;
-	// $danz Optional hier limitieren ($ipar_obj->overview->max_id)
-	$minid += $danz;
+	$danz = $fdata->get_count; // evt. $danz limitieren, Index startet mit 1
+	$minid = min($minid + $danz, $ipar_obj->overview->max_id+1) 
 
 	for ($i = 0; $i < $danz; $i++) {
 		$typ = $fdata->get_data[$i]->type;
@@ -231,5 +241,4 @@ $xlog .= "(Run:$mtrun msec)"; // Script Runtime
 
 echo "*IPUSH(DBG:$dbg) RES: ('$xlog')*\n"; // Always
 add_logfile($xlog); // Regular exit, entry in logfile should be first
-
 //
