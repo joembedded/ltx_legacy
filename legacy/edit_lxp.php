@@ -63,14 +63,14 @@ $pkan_beschr = array(
 
 $p200_beschr = array(	// sys_param.lxp
 	"*@200_Sys_Param",
-	"APN[$41] (opt.)",
-	"Server[$41]",
-	"Script[$41]",
+	"APN[$41]",
+	"Server/VPN[$41]",
+	"Script/Id[$41]",
 	"API Key[$41]",
-	"ConFlags[0..255] (B0:VB B1:ROAM B4:LOG_FILE (B5:LOG_UART) B7:DBG)",
-	"Pin[0..65535] (opt)",
-	"User[$41]",
-	"Password[$41]",
+	"ConFlags[0..255] (B0:Verbose B1:RoamAllow B4:LOG_FILE (B5:LOG_UART) B7:Debug)",
+	"SIM Pin[0..65535] (opt)",
+	"APN User[$41]",
+	"APN Password[$41]",
 	"Max_creg[10..255]",
 	"Port[1..65535]",
 	"Server_timeout_0[1000..65535]",
@@ -80,7 +80,8 @@ $p200_beschr = array(	// sys_param.lxp
 	"Bat. Volts 0%[float]",
 	"Bat. Volts 100%[float]",
 	"Max Ringsize (Bytes)[1000..2e31]",
-	"mAmsec/Measure[0..1e9]"
+	"mAmsec/Measure[0..1e9]",
+	"Mobile Protocol[0..255] B0:0/1:HTTP/HTTPS B1:VPF"
 );
 
 

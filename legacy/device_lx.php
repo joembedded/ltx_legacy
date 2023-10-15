@@ -30,7 +30,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 0.53 15.08.2023
+	// Version: 0.54 14.10.2023
 	
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
@@ -242,6 +242,14 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo "Last User Command (to Device): '" . htmlspecialchars($devi['luc_cmd']) . "' [$luc_dstr] (" . $devi['luc_state'] . ")<br>";
 	}
 
+	$etext=@file_get_contents("$dpath/cmd/okreply.cmd"); 
+	if($etext){ // Leerstring zaehlen als false
+		echo "Last Transmission OK: '".htmlspecialchars(substr(str_replace("\n"," ",$etext),0,40))."'";
+		if (!$demo) {
+			echo " <a href=\"unlink_lx.php?s=$mac&f=cmd/okreply.cmd\">[OK]</a>";
+		}
+		echo "<br>";
+	}
 
 	// Show Directory
 	// Directory-Show: Normally: Always FIRST: Get Directory, then get files...

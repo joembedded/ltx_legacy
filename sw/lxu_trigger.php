@@ -43,23 +43,21 @@ $api_key = @$_GET['k'];				// max. 41 Chars KEY
 $mac = strtoupper(@$_GET['s']); 		// exactly 16 UC Chars. api_key and mac identify device
 $reason = @$_GET['r'];				// Opt. Reason (ALARMS) (as in device_info.dat also) *t.b.d* (e.g. timeout or HK-Service-Meta)
 // reason&256: SEND Contact
+// $vpnf = @$_GET['v']; 				// If set direct formward - not used
 $now = time();						// one timestamp for complete run
 $mttr_t0 = microtime(true);           // Benchmark trigger
 $xlog = "(Import)";
 
 if (strlen($mac) != 16) {
-	if (strlen($mac) > 24) exit();		// URL Attacked?
 	exit_error("MAC Len");
 }
 
 if (@file_exists(S_DATA . "/$mac/cmd/dbg.cmd")) $dbg = 1; // Allow Individual Debug
 
 // Check Key before loading data
-echo "API-KEY: '$api_key' (Exp:" . S_API_KEY . ")\n"; // TEST
 if (!$dbg && strcmp($api_key, S_API_KEY)) {
 	exit_error("API Key");
 }
-
 
 // --- Now check files ---
 $dpath = S_DATA . "/$mac/in_new";		// Device Path (must exist)

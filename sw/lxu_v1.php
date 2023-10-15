@@ -1,9 +1,8 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 13.09.2023 - V1.40 joembedded@gmail.com  - JoEmbedded.de
+// (C) 11.10.2023 - V1.41 joembedded@gmail.com  - JoEmbedded.de
 // $maxmem limited to 20000 history data for autosync-files
 
-// *TODO* Achtung: PHP8 meckert u.a. null als String-Argument deprecated an. *TODO*
 // Evtl. "schnelle Hilfe": error_reporting (E_ALL & ~E_DEPRECATED);
 
 error_reporting(E_ALL);
@@ -42,7 +41,7 @@ function show_str($rem, $str)
 }
 
 // ---------------- Trigger: External async Script lxu_trigger.php -------------------------
-function trigger($reason)
+function trigger($reason, $vflag)
 {
 	global $xlog, $mac, $dbg; // xlog only as parameter
 
@@ -55,16 +54,12 @@ function trigger($reason)
 	$rpos = strrpos($self, '/'); // Evtl. check for  backslash (only Windows?)
 	$tscript = substr($self, 0, $rpos) . "/lxu_trigger.php";
 	$arg = "k=" . S_API_KEY . "&r=$reason&s=$mac";	// Parameter: API-KEY, reason and MAC
-
+	if($vflag) $arg .='&v';	// Enable VPNF-Mode
 	// return;	// Ein-kommentieren um Trigger Script NICHT starten wenn ohne DB
 
 	// First check if Trigger is available
 	$xlog = "";
-
-	if ($dbg > 1) {
-		echo "Start Trigger '$server:$port/$tscript?$arg'\n";
-	}
-
+	if ($dbg > 1) echo "Start Trigger '$server:$port/$tscript?$arg'\n";
 	if ($dbg) $xlog = "(Trigger: '$server:$port/$tscript?$arg')";
 
 	$ch = curl_init("$server:$port/$tscript?$arg");
@@ -90,7 +85,8 @@ $dbg = 0; // Debug-Level if >0, see docu
 
 $fname = @$_FILES['X']['tmp_name'];   // all data is contained in file 'X' RAW MODE
 $api_key = @$_GET['k'];				// max. 41 Chars KEY
-$mac = @$_GET['s']; 					// exactly 16 Zeichen. api_key and mac identify device
+$mac = @$_GET['s']; 				// 16 Zeichen. api_key and mac identify device
+$vpnf = @$_GET['v']; 				// If set direct formward
 $now = time();						// one timestamp for complete run
 $mtmain_t0 = microtime(true);         // for Benchmark 
 $dfn = gmdate("Ymd_His", $now);		// 'disk_filename_from_now' (sortable)
@@ -137,7 +133,7 @@ $extratxt = "";	// Added ASCII (Quectel-Cache-Prob)
 
 $idx = 0;		// Index in data
 $ecmd = "";	// echo-command
-$etext = "OK";
+// $etext = "OK"; // later
 
 // load infos about this device
 $devi = array();
@@ -177,9 +173,9 @@ for (;;) {
 	$idx += 4;	// points to next block
 	// echo "CMD: $cmd LEN: $len \n";
 	if (strcmp($sollcrc, $istcrc)) {
-		$xlog .= "(CRC Error Pos. $bp0)"; // Probably Wron Key
+		$xlog .= "(CRC Error Pos. $bp0)";
 		$etext = "ERROR: CRC";
-		break;	// CRC not OK
+		break;
 	}
 	$devi['now'] = $now;	// Actual Server Time 
 	switch ($cmd) {
@@ -383,7 +379,8 @@ for (;;) {
 			} else {	// Append to existing file
 				$of2 = fopen("$dpath/files/$fname", 'ab'); // Else append
 			}
-			fputs($of2, substr($data, $bp0 + 10 + $fnlen, $flen));
+			$newdata = substr($data, $bp0 + 10 + $fnlen, $flen);
+			fputs($of2, $newdata);
 			fclose($of2);
 
 			// If this upload was requested: Clear request-file
@@ -403,8 +400,8 @@ for (;;) {
 			// Store also the fragment in in_new
 			// Temp_filename is preceeded by filedate plus offset
 			$ftemp = gmdate("Ymd_His", $fdate) . "_$fpos0" . '_';
-			$of2 = fopen("$dpath/in_new/$ftemp$fname", 'wb'); // Delta as single file
-			$newdata = substr($data, $bp0 + 10 + $fnlen, $flen);
+			$nsfname = $ftemp.$fname;
+			$of2 = fopen("$dpath/in_new/$nsfname", 'wb'); // Delta as single file
 			fputs($of2, $newdata);
 			fclose($of2);
 			break;
@@ -765,7 +762,11 @@ if ($send_cmd <= 0) {
 }
 
 // Start Output with a last TEXT\n\n
-
+if(!isset($etext)){
+	$etext=@file_get_contents("$dpath/cmd/okreply.cmd");
+	if(!$etext) $etext = "OK"; // Default
+	else $etext = substr(str_replace("\n"," ",$etext),0,40); // NL etc..
+}
 echo "$etext(Id:$conid)\n\n"; // Default: OK
 
 if (!$expmore && strlen($ecmd) < 50) {	// If not: send at least curent server time
@@ -815,5 +816,5 @@ $xlog .= "(Run:$mtrun msec)"; // Script Runtime
 add_logfile(); // Regular exit, entry in logfile should be first
 
 if (!$expmore) {	// Finished! Start async trigger
-	trigger($devi['reason']);	// If trigger fails: New entry in logfile
+	trigger($devi['reason'], isset($vpnf));	// If trigger fails: New entry in logfile
 }
