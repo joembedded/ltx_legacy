@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 
 include("../sw/conf/api_key.inc.php");
 include("../sw/lxu_loglib.php");
+include("mcclist.inc.php");
 
 session_start();
 if (isset($_REQUEST['k'])) {
@@ -13,7 +14,7 @@ if (isset($_REQUEST['k'])) {
 } else {
 	$api_key = @$_SESSION['key'];
 }
-if(!isset($api_key)) $api_key=""; 
+if (!isset($api_key)) $api_key = "";
 if (!strcmp($api_key, L_KEY)) {
 	$dev = 1;	// Dev-Funktionen anzeigen
 } else {
@@ -22,8 +23,8 @@ if (!strcmp($api_key, L_KEY)) {
 }
 echo "<!DOCTYPE HTML><html><head>";
 
-if ($dev) $title = "Legacy LTrax Server Develop-Login V0.52";
-else $title = "Legacy LTrax Server Home and Guest/Demo-Login V0.52";
+if ($dev) $title = "LegacyLTX Develop-Login V0.54";
+else $title = "LegacyLTX Home and Guest/Demo-Login V0.54";
 
 $self = $_SERVER['PHP_SELF']; // Periodisch alle 30 Sekunden  auffrischen
 echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
@@ -42,9 +43,9 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	// dev.php DevPortal Script for LTrax. Details: see docu
 	// Only for Low-Level Developer Access!!!
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// V0.52 / 06.06.2023
+	// V0.54 / 16.10.2023
 	// todo: --- maybe LOCK makes sense for several files
-	if(!isset($self) || strlen($self)<4) echo "WARNING: 'PHP_SELF' not set<br>";
+	if (!isset($self) || strlen($self) < 4) echo "WARNING: 'PHP_SELF' not set<br>";
 
 	// --- ensure user access (e.g. via keys)
 
@@ -81,7 +82,6 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 		}
 	}
 
-
 	if ($dev) echo "<b>Devicelist (DIR: '$dir'):</b><br>"; // Show Directory
 	else echo "<b>Devicelist:</b><br>"; // Show Directory
 
@@ -93,11 +93,21 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 		if (!is_dir("./$dir/$file")) continue;	// Should not be, but..
 		if (!$dev && !@file_exists(S_DATA . "/$file/demo.cmd")) continue;
 
-
+		$devi = array();
 		$fage = "???";
-		if (@file_exists(S_DATA . "/$file/device_info.dat")) {
-			$dt = $now - filemtime(S_DATA . "/$file/device_info.dat");
-			$fage = secs2period($dt);
+		$lines = @file(S_DATA . "/$file/device_info.dat", FILE_IGNORE_NEW_LINES  | FILE_SKIP_EMPTY_LINES);
+		if ($lines) {
+			// Hier noch mehr Mgl.: Letzter Transfer, Bat, ...
+			foreach ($lines as $line) {
+				$tmp = explode("\t", $line);
+				$val = $tmp[1];
+				$devi[$tmp[0]] = $tmp[1];
+				// echo "Line: $line<br>";
+			}
+			if (!empty($devi['now'])) {
+				$dt = $now - $devi['now'];
+				$fage = secs2period($dt);
+			}
 			$bakg = "";
 			if ($dt > 259200) { // 14d
 				$bakg = "magenta";
@@ -120,19 +130,23 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 		// Link to this device
 		echo "<a href=\"device_lx.php?s=$file\" target='_blank'>$file</a>";
 
-		echo " (Name: ";
+		echo " (Name LTX: ";
 		$iparam_info =  @file(S_DATA . "/$file/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
-		if (@isset($iparam_info[5])) echo "'<b>".htmlspecialchars($iparam_info[5])."</b>'";
+		if (@isset($iparam_info[5])) echo "'<b>" . htmlspecialchars($iparam_info[5]) . "</b>'";
 		else echo "(NO 'iparam.lxp')";
 
 
-		echo " , Legacy Name: ";
+		echo " , Legacy: "; // Only Legac
 		$user_info = @file(S_DATA . "/$file/user_info.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-		if (@$user_info[0]) echo "'<b>".htmlspecialchars($user_info[0])."</b>'";
-		else echo '(NOT SET)';
+		if (@$user_info[0]) echo "'<b>" . htmlspecialchars($user_info[0]) . "</b>'";
+		else echo '(<i>not set</i>)';
 		echo ")";
 
-
+		$sig=@$devi['signal'];
+		if($sig){
+			$country=@$mcca[intval(substr($sig,4))];
+			if($country) echo " &nbsp; (<i>$country</i>) &nbsp; ";
+		}
 		echo " Last Contact: $fage";
 		if ($dev && @file_exists(S_DATA . "/$file/cmd/dbg.cmd")) {
 			echo " <b>***Debug enabled***</b>";
@@ -185,7 +199,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 			echo "<a href=\"view.php?s=log&f=_pcplog_old.txt\">Old Main Push-Pull-Logfile '_pcplog_old.txt'</a> ($ds Bytes, Age: $fa)<br>";
 		}
 
-		if(@file_exists("../sw/service/index.php")){
+		if (@file_exists("../sw/service/index.php")) {
 			echo "<br><a href=\"../sw/service/index.php\" target='_blank'>Service...</a>";
 		}
 
@@ -198,7 +212,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 		<br>
 		<form method="post" action="index.php">
 			<!-- User (Legacy): --><input placeholder="Enter User" type="input" name="user" value="legacy" hidden>
-			<b>Password ('L_KEY'): </b><input placeholder="Enter Password" type="password" name="k"> 	<input type="Submit" value="Login">
+			<b>Password ('L_KEY'): </b><input placeholder="Enter Password" type="password" name="k"> <input type="Submit" value="Login">
 		</form>
 	<?php
 	} else {

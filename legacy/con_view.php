@@ -5,6 +5,7 @@
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
+include("mcclist.inc.php");
 
 // ---------------------------- M A I N --------------
 
@@ -77,6 +78,9 @@ if (strcasecmp($ext, ".txt")) {
 			$sqs = 'k='.G_API_KEY."&s=$mac&lnk=1&mcc=$mcc&net=$net&lac=$lac&cid=$cid"; // Link
 		
 			echo " --- Cell($ccnt):" . $tar . " arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\">[Here]</a>";
+
+			$country=@$mcca[$mcc];
+			if($country) echo " &nbsp; (<i>$country</i>) &nbsp; ";
 
 		/* Ask DB for each line is SLOW 
 		$sqs = 'k='.G_API_KEY."&s=$mac&lnk=0&mcc=$mcc&net=$net&lac=$lac&cid=$cid"; // No Link

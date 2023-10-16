@@ -19,7 +19,7 @@ if (!strcmp($api_key, L_KEY)) {
 <html>
 
 <head>
-	<title>Legacy LTrax Edit Quota</title>
+	<title>LegacyLTX Edit Quota</title>
 </head>
 
 <body>
@@ -31,8 +31,8 @@ if (!strcmp($api_key, L_KEY)) {
 
 	// ----------- M A I N ---------------
 	$mac = @$_GET['s']; 					// exactly 16 Zeichen. api_key and mac identify device
-	echo "<p><b><big>Legacy LTrax Edit Quota </big></b><br></p>";
-	echo "<p><a href=\"index.php\">Legacy LTrax Home</a><br>";
+	echo "<p><b><big>LegacyLTX Edit Quota </big></b><br></p>";
+	echo "<p><a href=\"index.php\">LegacyLTX Home</a><br>";
 	echo "<a href=\"device_lx.php?s=$mac&show=a\">Device View $mac (All)</a><br></p>";
 
 	$dpath = S_DATA . "/$mac/quota_days.dat";
@@ -42,7 +42,7 @@ if (!strcmp($api_key, L_KEY)) {
 	echo "<form name=\"uname_editform\"  action=\"./set_quota.php?s=$mac\" method=\"post\">";
 	echo "<label for=\"d\">Days (&ge;1): </label> <input id=\"d\" name=\"udays\" value=\"" . @$quota[0] . "\"><br>";
 	echo "<label for=\"l\">Lines (&ge;10): </label> <input id=\"l\" name=\"ulines\" value=\"" . @$quota[1] . "\"><br><br>";
-	echo "<label for=\"p\">Push (URL/'*' opt. plus ' ' plus Accesskey): </label> <input id=\"p\" size=\"100\" name=\"upush\" value=\"" . @$quota[2] . "\"><br>";
+	echo "<label for=\"p\">Push (URL or '*' opt. plus ' ' plus Accesskey): </label> <input id=\"p\" size=\"100\" name=\"upush\" value=\"" . @$quota[2] . "\"><br>";
 	?>
 	<input type="Submit" name="UP">
 	</form>
