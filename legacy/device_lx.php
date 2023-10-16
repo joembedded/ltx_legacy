@@ -2,6 +2,7 @@
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
 @include("../sw/conf/config.inc.php");
+include("mcclist.inc.php");
 
 session_start();
 if (isset($_REQUEST['k'])) {
@@ -22,12 +23,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- <link rel="stylesheet" href="css/w3.css"> -->
 
-<title>Legacy LTrax Device View</title>
-</head>
-
-<body>
-
-	<?php
+<?php
 	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
 	// Version: 0.54 14.10.2023
@@ -48,11 +44,18 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	$mtmain_t0 = microtime(true);         // for Benchmark 
 	$mac = @$_REQUEST['s'];
 	$now = time();
-
 	$dbg = 0;	// Biser noch ohne Fkt.
-
-
 	$dpath = S_DATA . "/$mac";
+
+	if(!isset($dname)){
+		$iparam_info =  @file(S_DATA . "/$dpath/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
+		$dname = @htmlspecialchars(@$iparam_info[5]);
+	}
+	echo"<title>LegacyLTX ";
+	if(isset($dname)) echo"'$dname'";
+	else echo "MAC:$mac";
+	echo"</title></head><body>";
+
 
 	if (!isset($mac)) {
 		echo "ERROR: MAC required";
@@ -68,8 +71,8 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	}
 
 
-	echo "<p><b><big>LTrax Device View $mac</big></b><br></p>";
-	echo "<p><a href=\"index.php\">Legacy LTrax Home</a><br>";
+	echo "<p><b><big>LTX Device View $mac</big></b><br></p>";
+	echo "<p><a href=\"index.php\">LegacyLTX Home</a><br>";
 
 	if ($demo) echo "<b><font color=\"red\">*** Guest Mode (Read-Only) ***</font></b>";
 
@@ -92,14 +95,13 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	echo "</p><p><b>Device Info:</b><br>";
 
 	echo "Name: ";
-	$iparam_info =  @file(S_DATA . "/$dpath/files/iparam.lxp", FILE_IGNORE_NEW_LINES);
-	if (@isset($iparam_info[5])) echo "'<b>" . htmlspecialchars($iparam_info[5]) . "</b>'";
+	if (isset($dname)) echo "'<b>$dname</b>'";
 	else echo "(NO 'iparam.lxp')";
 	echo "<br>";
 
 	$user_info = @file("$dpath/user_info.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 	if (@$user_info[0]) echo "Legacy Name: '<b>" . htmlspecialchars($user_info[0]) . "</b>'";
-	else echo "Legacy Name: (NOT SET)";
+	else echo "Legacy Name: (<i>not set</i>)";
 	if (!$demo) echo " <a href=\"edit_userinfoname.php?s=$mac\">[Edit Legacy Name ('user_info.dat')]</a>";
 	echo "<br>";
 
@@ -151,7 +153,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		else echo "(Unknown)";
 		if (!$demo) {
 			if (isset($quota[2])) echo ", Push: '".htmlspecialchars($quota[2])."'";
-			else echo ", Push: (NOT SET)";
+			else echo ", Push: (<i>not set</i>)";
 			echo " <a href=\"edit_quota.php?s=$mac\">[Edit Quota/Push ('quota_days.dat')]</a>";
 		}
 		echo "<br>";
@@ -230,7 +232,15 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		if ($asig['ta'] == 255) $radius = "";
 		else $radius = "ca. " . ($asig['ta'] * 500 + 500) . " mtr ";
 
-		echo " - Device located " . $radius . "arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\" title=\"Estimated Position of last Cell Tower\">[Here]</a><br>";
+		echo " - Device located " . $radius . "arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\" title=\"Estimated Position of last Cell Tower\">[Here]</a> ";
+
+		$sig=@$devi['signal'];
+		if($sig){
+			$country=@$mcca[intval(substr($sig,4))];
+			if($country) echo " &nbsp; (<i>$country</i>) &nbsp; ";
+		}
+		echo "<br>";
+
 	}
 
 	if (!empty($devi['lut_cont'])) {
@@ -582,9 +592,6 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	}
 
 	$mtrun = round((microtime(true) - $mtmain_t0) * 1000, 4);
-	echo "<small>(Runtime: $mtrun msec)</small></p>";
-
+	echo "<small>(Runtime: $mtrun msec)</small></p></body>";
 	?>
-</body>
-
 </html>
