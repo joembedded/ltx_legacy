@@ -80,7 +80,8 @@ if (strcasecmp($ext, ".txt")) {
 			echo " --- Cell($ccnt):" . $tar . " arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\">[Here]</a>";
 
 			$country=@$mcca[$mcc];
-			if($country) echo " &nbsp; (<i>$country</i>) &nbsp; ";
+			if(!$country) $country=$mcca[intval($mcc/100)]; // Fallback
+			echo " (<i>$country</i>)";
 
 		/* Ask DB for each line is SLOW 
 		$sqs = 'k='.G_API_KEY."&s=$mac&lnk=0&mcc=$mcc&net=$net&lac=$lac&cid=$cid"; // No Link

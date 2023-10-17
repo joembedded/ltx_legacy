@@ -54,7 +54,7 @@ function trigger($reason, $vflag)
 	$rpos = strrpos($self, '/'); // Evtl. check for  backslash (only Windows?)
 	$tscript = substr($self, 0, $rpos) . "/lxu_trigger.php";
 	$arg = "k=" . S_API_KEY . "&r=$reason&s=$mac";	// Parameter: API-KEY, reason and MAC
-	if($vflag) $arg .='&v';	// Enable VPNF-Mode
+	if ($vflag) $arg .= '&v';	// Enable VPNF-Mode
 	// return;	// Ein-kommentieren um Trigger Script NICHT starten wenn ohne DB
 
 	// First check if Trigger is available
@@ -74,6 +74,7 @@ function trigger($reason, $vflag)
 	curl_close($ch);
 
 	if (strlen($xlog)) {
+		$xlog = '(trigger)' . $xlog;
 		add_logfile();	// If triger fails: Add ne line to logfile
 	}
 }
@@ -92,7 +93,6 @@ $mtmain_t0 = microtime(true);         // for Benchmark
 $dfn = gmdate("Ymd_His", $now);		// 'disk_filename_from_now' (sortable)
 
 $send_cmd = -1;						// If set (0-255) send as Flags-cmd
-
 if (!isset($mac) || strlen($mac) != 16) {
 	if (strlen($mac) > 24) exit();		// URL Attacked?
 	exit_error("MAC Len");
@@ -107,6 +107,7 @@ if (!$dbg && (!isset($api_key) || strcmp($api_key, D_API_KEY))) {
 	exit_error("API Key");
 }
 
+$xlog = "(lxu_v1)";
 if (empty($fname)) {
 	exit_error("No Data");
 }
@@ -124,7 +125,7 @@ if ($dbg) {	// log all incomming data local and also txt
 	$of = fopen(S_DATA . "/$mac/dbg/$dfn.txt", 'w'); // then open txt
 }
 
-$xlog = "($maxlen Bytes Data)";
+$xlog .= "($maxlen Bytes Data)";
 
 $dpath = S_DATA . "/$mac";				// Device Path
 $stage = -1;	// Assume Stage no stage for this communication
@@ -400,7 +401,7 @@ for (;;) {
 			// Store also the fragment in in_new
 			// Temp_filename is preceeded by filedate plus offset
 			$ftemp = gmdate("Ymd_His", $fdate) . "_$fpos0" . '_';
-			$nsfname = $ftemp.$fname;
+			$nsfname = $ftemp . $fname;
 			$of2 = fopen("$dpath/in_new/$nsfname", 'wb'); // Delta as single file
 			fputs($of2, $newdata);
 			fclose($of2);
@@ -498,7 +499,7 @@ if ($send_cmd <= 0 && file_exists("$dpath/cmd/_firmware.sec.umeta")) { // Check 
 				$xlog .= "(New Firmware sent(" . $fwinfo['sent'] . "))"; // Cnt
 				$expmore = 1;		// Reply once after transfer
 				$send_cmd = 128;	// With RESET afterwards in first round
-				$extratxt = str_repeat("Stuff",1000); // 5k Dummy wg. Quectel-Problem
+				$extratxt = str_repeat("Stuff", 1000); // 5k Dummy wg. Quectel-Problem
 
 				$of2 = fopen("$dpath/cmd/_firmware.sec.umeta", 'w');
 				foreach ($fwinfo as $key => $val) {
@@ -762,10 +763,10 @@ if ($send_cmd <= 0) {
 }
 
 // Start Output with a last TEXT\n\n
-if(!isset($etext)){
-	$etext=@file_get_contents("$dpath/cmd/okreply.cmd");
-	if(!$etext) $etext = "OK"; // Default
-	else $etext = substr(str_replace("\n"," ",$etext),0,40); // NL etc..
+if (!isset($etext)) {
+	$etext = @file_get_contents("$dpath/cmd/okreply.cmd");
+	if (!$etext) $etext = "OK"; // Default
+	else $etext = substr(str_replace("\n", " ", $etext), 0, 40); // NL etc..
 }
 echo "$etext(Id:$conid)\n\n"; // Default: OK
 

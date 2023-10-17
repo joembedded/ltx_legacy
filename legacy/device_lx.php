@@ -236,11 +236,12 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 
 		$sig=@$devi['signal'];
 		if($sig){
-			$country=@$mcca[intval(substr($sig,4))];
-			if($country) echo " &nbsp; (<i>$country</i>) &nbsp; ";
+			$mccs = substr($sig,4,3);
+			$country=@$mcca[intval($mccs)];
+			if(!$country) $country=$mcca[intval($mccs[0])]; // Fallback
+			echo " &nbsp; (<i>$country</i>) &nbsp; ";
 		}
 		echo "<br>";
-
 	}
 
 	if (!empty($devi['lut_cont'])) {
