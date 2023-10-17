@@ -105,7 +105,7 @@ function add_logfile()
 			}
 		}
 
-		$log = fopen($sdata . "/$mac/log.txt", 'a');
+		$log = fopen($logpath . "log.txt", 'a');
 		if (!$log) return;
 		while (!flock($log, LOCK_EX)) usleep(10000);  // Lock File - Is a MUST
 		//fputs($log,gmdate("d.m.y H:i:s ",$now)."UTC ".$_SERVER['REMOTE_ADDR'].' '.$_SERVER['PHP_SELF']);

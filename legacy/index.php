@@ -144,8 +144,10 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 
 		$sig=@$devi['signal'];
 		if($sig){
-			$country=@$mcca[intval(substr($sig,4))];
-			if($country) echo " &nbsp; (<i>$country</i>) &nbsp; ";
+			$mccs = substr($sig,4,3);
+			$country=@$mcca[intval($mccs)];
+			if(!$country) $country=$mcca[intval($mccs[0])]; // Fallback
+			echo " &nbsp; (<i>$country</i>) &nbsp; ";
 		}
 		echo " Last Contact: $fage";
 		if ($dev && @file_exists(S_DATA . "/$file/cmd/dbg.cmd")) {

@@ -1,6 +1,17 @@
 <?php
 // A small list for most important countries MCC
 $mcca=array();
+$mcca[0] = 'Unknown'; // Pos 0-9: Falback
+$mcca[1] = 'Test network';
+$mcca[2] = 'Europe';
+$mcca[3] = 'North America and Caribbean';
+$mcca[4] = 'Asia, India, Middle East';
+$mcca[5] = 'Australia, Oceania';
+$mcca[6] = 'Africa';
+$mcca[7] = 'South America';
+$mcca[8] = 'Unknown'; 
+$mcca[9] = 'Unknown'; 
+$mcca[202]='Greece'; 
 $mcca[204]='Netherlands';
 $mcca[206]='Belgium';
 $mcca[208]='France';
