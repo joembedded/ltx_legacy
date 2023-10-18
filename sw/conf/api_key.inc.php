@@ -9,6 +9,7 @@
 	
 	define ("DB_QUOTA","90\n1000"); // Default Quota for new Devices (if Database is used: 'Days\nLines')
 	define ("L_KEY","LegacyLTX");	// legacyKey for ***LEGACY Login***
+	//define ("MAXUPLMEM", 50000);	// if defined max. automatic upload limit, default: 20kB
 	// Optionally (if GPS_VIEW used):
 	define ("MAPKEY","pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw"); // Key for MAPBOX.COM Mapserver, Request an OWN one if necessary!
 

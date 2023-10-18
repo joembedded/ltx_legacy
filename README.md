@@ -29,14 +29,16 @@ The input script '../sw/ltu_trigger.php' will add the data (feel free to modify 
  5. Log in to Legacy 'https://SERVER.XYZ/xxx/legacy/index.html'
  (Hint: for fast access bookmark it like this: https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY)
 
-
 _(Just as Info: In case of "LTX_Server" all new data will be written to the database. There is a quota limit in
-'./sw/conf/api_key.inc.php' ("DB_QUOTA" with default "3650\n100000000"). A file 'quota_days.dat' with 2-3 lines
-will automatically be written for each new logger, 1.st line are days (here 3650), 2.nd line is lines (in the database).
+'./sw/conf/api_key.inc.php' ("DB_QUOTA" with default "90\n1000"). A file 'quota_days.dat' with 2-3 lines
+will automatically be written for each new logger, 1.st line are days (here 90), 2.nd line is lines (in the database, so even a small DB can hold thousands of devices).
 The optional 3.rd line is an URL where to send a PUSH notification on new data (only used for LTX_Server).
 The input script 'sw\ltu_trigger.php' will automatically remove older data.
-Change e.g. to "90\n1000" to allow only the last 90 days or max. 1000 lines per device (so even a small DB can hold thousands of devices).
-The file 'quota_days.dat' my be set to individual values per logger at any time. )_
+Change e.g. to "365\n100000" to allow only the last 365 days or max. 100000 lines per device.
+The file 'quota_days.dat' my be set to individual values per logger at any time.
+Optionally enable '//define ("MAXUPLMEM", 50000);': By default max. 20k are uploaded for files with Autosync (e.g. logger data) per transmission.
+For are transmission intervals at high logging intervals it should be increased to get always all data. )_
+
 
 _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Key for the device via external 'KEY_SERVER_URL' is requred)_
 
@@ -58,4 +60,6 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V1.76 06.06.2023 Access Legacy for Admin Users
 - V1.77 28.06.2023 Added sw/js/xtract_demo.html: demo to access BLE_API data in IndexDB
 - V1.79 05.10.2023 Added CommandConfig as new Parameter in 'iparam.lxp'
+- V2.00 15.10.2023 Direct FTP/FTPSSL-Push via CommandConfig (only 'LTX_Server')
+- V2.01 18.10.2023 Cosmetics and FTP-push (only 'LTX_Server')
 

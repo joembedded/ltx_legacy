@@ -1,7 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
 // (C) 11.10.2023 - V1.41 joembedded@gmail.com  - JoEmbedded.de
-// $maxmem limited to 20000 history data for autosync-files
 
 // Evtl. "schnelle Hilfe": error_reporting (E_ALL & ~E_DEPRECATED);
 
@@ -70,11 +69,11 @@ function trigger($reason, $vflag)
 		$res = curl_exec($ch);	// Might be very long!
 		$xlog .= "(Curl Result:\nSTART=====>\n$res\n<=====END)";
 	} else curl_exec($ch);
-	if (curl_errno($ch)) $xlog .= '(ERROR: Curl:' . curl_error($ch) . ')';
+	if (curl_errno($ch)) $xlog .= '(CURL:' . curl_error($ch) . ')';
 	curl_close($ch);
 
 	if (strlen($xlog)) {
-		$xlog = '(trigger)' . $xlog;
+		$xlog = '(call trigger)' . $xlog;
 		add_logfile();	// If triger fails: Add ne line to logfile
 	}
 }
@@ -303,8 +302,8 @@ for (;;) {
 				}
 				// Decide how much to uploade
 				if ($le > $la) {	// New Data?
-					// Limit Uploads to 20k per file first! Can be in-/de-creased by the user...
-					$maxmem = 20000;
+					if(defined("MAXUPLMEM")) $maxmem = MAXUPLMEM; // Limit Uploads 
+					else $maxmem = 20000;
 					if ($le - $la > $maxmem) {
 						$la = $le - $maxmem;
 						$xlog .= "(WARNING: File:'$fname' Sizelimit $maxmem )";
