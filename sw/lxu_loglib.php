@@ -82,7 +82,7 @@ function add_logfile()
 	$log = @fopen($sdata . "/log/log.txt", 'a');
 	if ($log) {
 		while (!flock($log, LOCK_EX)) usleep(10000);  // Lock File - Is a MUST
-		fputs($log, gmdate("d.m.y H:i:s ", $now) . "UTC " . $_SERVER['REMOTE_ADDR'] . ' ' . $_SERVER['PHP_SELF']);        // Write file
+		fputs($log, gmdate("d.m.y H:i:s ", $now) . "UTC " . $_SERVER['REMOTE_ADDR'] );        // Write file
 		if (strlen($mac)) fputs($log, " MAC:$mac"); // mac only for global lock
 		fputs($log, " $xlog\n");        // evt. add extras
 		flock($log, LOCK_UN);
@@ -108,7 +108,7 @@ function add_logfile()
 		$log = fopen($logpath . "log.txt", 'a');
 		if (!$log) return;
 		while (!flock($log, LOCK_EX)) usleep(10000);  // Lock File - Is a MUST
-		//fputs($log,gmdate("d.m.y H:i:s ",$now)."UTC ".$_SERVER['REMOTE_ADDR'].' '.$_SERVER['PHP_SELF']);
+		//fputs($log,gmdate("d.m.y H:i:s ",$now)."UTC ".$_SERVER['REMOTE_ADDR']]);
 		fputs($log, gmdate("d.m.y H:i:s ", $now) . "UTC");
 		fputs($log, " $xlog\n");        // evt. add extras
 		flock($log, LOCK_UN);
