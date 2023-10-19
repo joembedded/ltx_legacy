@@ -8,6 +8,7 @@ LTX can be installed WITH (named as "LTX_Server") Database and WITHOUT (named as
 In case of "LTX_Legacy" all data will be sent to directories and ALL device's new data will
 be added to a file '.../out_total/total.edt' for the device. This file is simple text ('EDT'-Format) 
 and might become quite large over time ;-)
+Note: using "CS_VIEW.PHP' for graphs requires PHP's gdlib extension enabled.
 
 Some very simple scripts allow rudimentary access to all devices/loggers functions (as well as secure FOTA Updates and generating device Labels)
 
@@ -62,4 +63,5 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V1.79 05.10.2023 Added CommandConfig as new Parameter in 'iparam.lxp'
 - V2.00 15.10.2023 Direct FTP/FTPSSL-Push via CommandConfig (only 'LTX_Server')
 - V2.01 18.10.2023 Cosmetics and FTP-push (only 'LTX_Server')
+- V2.10 19.10.2023 Decoding of compressed lines (starting with '$'+Base64) added
 
