@@ -5,7 +5,7 @@ V2.12 06.12.2020
 ----
   V2.12: Tested PHP8 and VS with intellisense
 
-  Requires GD-Library and PHP >= 5
+  *** Requires GD-Library (php.ini: enable 'extention=gd' and PHP >= 5 *** 
 
   URL-Parameters:
 
@@ -164,6 +164,7 @@ $anz = read_csv();
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style type="text/css">
     * {
       font-family: sans-serif;

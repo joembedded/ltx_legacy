@@ -4,29 +4,105 @@
 	* EDT ("EasyDaTa") is a very flexible and easy-2-use file format to 
 	* store logged data. Read the docu!
 	*
-    * Version: V1.12 - 12.10.2023
+    * Version: V2.00 - 19.10.2023
 	* (C) JoEmbedded.de
     * ---------------------------------------------------------------------- */
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
 include("../sw/lxu_loglib.php");
-session_start();
-if (isset($_REQUEST['k'])) {
-	$api_key = $_REQUEST['k'];
-	$_SESSION['key'] = L_KEY;
-} else $api_key = @$_SESSION['key'];
-if (!strcmp($api_key, L_KEY)) {
-	$dev = 1;	// Dev-Funktionen anzeigen
-} else {
-	$dev = 0;	// Dev-Funktionen anzeigen
+
+// -- $B64-Functions / Decompress -
+// Only allowed token 111 and tokens 0..89
+// HK-Values etc. in plain!
+function get_u16($valstr)
+{
+	$ui16 = unpack('n', $valstr)[1];
+	return $ui16;
 }
-/*
-	if(!$dev) {
-		echo "ERROR: Access denied!";
-		exit();
+
+function get_ef32($valstr)
+{
+	$hval = intval(unpack('N', $valstr)[1]);
+	if (($hval >> 24) == 0xFD) {
+		$errno = $hval & 0xFFFFFF;
+		return get_errstr($errno);
 	}
-*/
+	return round(decode_f32($hval), 8); // Float max. 8 Digits
+}
+function get_errstr($errno)
+{ // wie measure.c
+	switch ($errno) {
+		case 1:
+			return 'NoValue';
+		case 2:
+			return 'NoReply';
+		case 3:
+			return 'OldValue';
+			// 4,5
+		case 6:
+			return 'ErrorCRC';
+		case 7:
+			return 'DataError';
+		case 8:
+			return 'NoCachedValue';
+		default:
+			return "Err$errno";
+	}
+}
+function decode_f32($bin) // U32 -> Float IEEE 754
+{
+	$sign = ($bin & 0x80000000) > 0 ? -1 : 1;
+	$exp = (($bin & 0x7F800000) >> 23);
+	$mantis = ($bin & 0x7FFFFF);
+
+	if ($mantis == 0 && $exp == 0) {
+		return 0;
+	}
+	if ($exp == 255) {
+		if ($mantis == 0) return INF;
+		if ($mantis != 0) return NAN;
+	}
+	if ($exp == 0) { // denormalisierte Zahl
+		$mantis /= 0x800000;
+		return $sign * pow(2, -126) * $mantis;
+	} else {
+		$mantis |= 0x800000;
+		$mantis /= 0x800000;
+		return $sign * pow(2, $exp - 127) * $mantis;
+	}
+}
+
+$deltatime = 0; // Zeilenuebergreifend
+function decodeB64($ostr)
+{ // ENTRY - On Error return false
+	global $deltatime;
+	$dwbytes = base64_decode($ostr); // Bytes decodiert
+	$dwlen = strlen($dwbytes);
+	$odstr = "";	// Ausgabestring - LTX-Konform
+	$idx = 0;
+	while ($dwlen-- > 0) {
+		$tok = ord($dwbytes[$idx++]);
+		if ($tok == 111) { // Deltatime am Anf un dnur merken
+			if ($dwlen < 2) break;
+			$deltatime = get_u16(substr($dwbytes, $idx, 2));
+			$idx += 2;
+			$dwlen -= 2;
+			continue;
+		}
+		if (!strlen($odstr)) $odstr = "+$deltatime";
+		if ($tok <= 89) { // 0-89 F32 Kanaele
+			if ($dwlen < 4) break;
+			$vals = get_ef32(substr($dwbytes, $idx, 4));
+			$idx += 4;
+			$dwlen -= 4;
+			$odstr .= " $tok:$vals";
+		} else break;
+	}
+	if ($dwlen > 0) return false; // Something left?
+	// echo "('$ostr' => '$odstr')\n"; // Dbg
+	return $odstr;
+}
 
 // ---------------------------- M A I N --------------
 $err_cnt = 0;
@@ -96,10 +172,17 @@ echo "<MAC: $mac>\n";  // Opt. with name
 // FIRST STEP: Find out all used channels
 $chan = array(); // Mapps channel numbers to units
 $ch_cnt = array(); // Counts number of values for this channel
-$cnt = 0;  // Line in the RAW Data!
 $talarm_cnt = 0;	// Total Alarm Count
-foreach ($data as $line) {
-	$cnt++;
+$anzdata = count($data);
+for ($cnt = 0; $cnt < $anzdata; $cnt++) {
+	$line = $data[$cnt];
+	if ($line[0] === '$') { // Decompress BASE64 line
+		$odstr = decodeB64(substr($line, 1));
+		if ($odstr !== false) {	// Uebernehmen
+			$line = '!'.$odstr;
+			$data[$cnt] =  $line;
+		}
+	}
 	if ($line[0] != '!') continue;	// Ignore Lines without leading !
 	if ($line[1] == 'U') continue;	// Ignore Lines with UNITS
 	$tmp = explode(' ', $line);
@@ -143,7 +226,7 @@ foreach ($data as $line) {
 				if (strcmp(substr($line, 0, 4), "<NT ")) continue;
 			} else continue;
 		}
-		echo "$line\n";
+		echo "$line\n"; // If unknown: Show Original
 		continue;
 	}
 	if ($line[1] == 'U') { // UNITS found

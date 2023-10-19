@@ -105,7 +105,6 @@ function draw_workspace()
   // Arbeitsflaeche ist nun vorbereitet
   $xpos = ($sizex - strlen($logger) * imagefontwidth(FONTT)) / 2;
   Imagestring($bild, FONTT, $xpos, MARGT / 4, $logger, $black);
-  //Imagestring($bild,1,$sizex-60,0,"GeoPrecision",$black);
 }
 
 // -------- Datei einlesen, mit scany: Autobereich festlegen ----------
@@ -124,6 +123,7 @@ function read_csv($azoomy)
       }
       if (!strncmp($tline, "<MAC:", 5)) $logger = trim($tline, "\r\n<>");
     } else if ($tline[0] == 'N') {     // No units, ...
+      $tline = iconv("utf-8","ISO-8859-1//IGNORE",$tline); 
       $units = explode(',', rtrim($tline));
       $units[1] = "Events";       // Umnennen
       while (strlen($vis) < count($units)) $vis .= '0';  // vis lange genug machen
