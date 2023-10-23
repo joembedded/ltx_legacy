@@ -143,7 +143,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 
 	echo "Transmission Count (All/OK): " . $devi['conns'] . '/' . @$devi['trans'] . '<br>';
 
-	if (@strlen(DB_NAME)) {
+	if (defined("DB_NAME")) {
 		$quota = @file("$dpath/quota_days.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 		echo "Quota Days: ";
 		if (isset($quota[0])) echo $quota[0];
