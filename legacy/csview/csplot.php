@@ -57,7 +57,7 @@ $minx = 0;
 $maxx = 1e6;   // 1 Million Datensaetze max.
 
 // -- Ab hier Benutzerwerte, arbeiten nur im Unterverzeichnis stemp erlaubt ---
-if (@$_GET['file']) $fname = '../' . S_DATA . '/stemp/' . $_GET['file']; // AUfrufen: file=xxx
+if (@$_GET['file']) $fname = @$_GET['file']; // AUfrufen: file=xxx
 if (@$_GET['maxy']) {
   $azoomy = 0;  // Nicht zoomen
   $maxy = $_GET['maxy'];
@@ -90,7 +90,6 @@ function message($err, $xit = 0)
 function draw_workspace()
 {
   global $bild, $black, $white, $cx0, $cx1, $cy0, $cy1, $logger, $sizex;
-
   imagefilledrectangle($bild, $cx0, $cy1, $cx1, $cy0, $white);
   $p = array();
   $p[0] = $cx0 - 1;
@@ -113,17 +112,19 @@ function read_csv($azoomy)
   global $fname, $miny, $maxy, $logger, $units, $data, $vis, $minx, $maxx; // Maxcol: Anzahl der Spalzen (inkl. Datum und Events
   $cnt = 0;
   $data = array();
-  $inf = @fopen($fname, "r");
-  if (!$inf) message("*** CSPLOT ERROR: Can't open File '$fname'", 1);
+  $inf = @fopen($fname , "r");
+  if (!$inf) throw new Exception("*** CSPLOT ERROR: Can't open File '$fname'");
 
   while ($tline = fgets($inf, 1000)) {
+    $tline = iconv("utf-8", "ISO-8859-1//IGNORE", $tline); // BOM mark (UTF8) macht sonst evtl. Aerger!
     if ($tline[0] == '<') {        // Blabla
       if ($cnt >= $minx && $cnt <= $maxx) {
         $data[] = rtrim($tline);
       }
-      if (!strncmp($tline, "<MAC:", 5)) $logger = trim($tline, "\r\n<>");
+      if (!strncmp($tline, "<MAC:", 5)) {
+        $logger = trim($tline, "\r\n<>");
+      }
     } else if ($tline[0] == 'N') {     // No units, ...
-      $tline = iconv("utf-8","ISO-8859-1//IGNORE",$tline); 
       $units = explode(',', rtrim($tline));
       $units[1] = "Events";       // Umnennen
       while (strlen($vis) < count($units)) $vis .= '0';  // vis lange genug machen
@@ -239,7 +240,6 @@ function draw_lines()
   for ($i = 0; $i < $dx; $i++) {
     $cax = $fca * $i + $fcb;   // Das ist die Y-Position
     $ay = $data[$i];
-
     if (is_string($ay)) $ayc = 1;  // PHP8 typkritischer als 7
     else $ayc = count($ay);
 
@@ -261,7 +261,7 @@ function draw_lines()
 
         Imagefilledrectangle($bild, $cax - 2, $cy0 - 8, $cax + 2, $cy0, $ecol);
 
-        if ($she) {
+        if ($she && gettype($ay) == 'string') {
           ImageStringUp($bild, FONTX, $cax - $hfo2, $cy0 - 10, $ay, $black);
         }
       }
@@ -374,6 +374,7 @@ function draw_legend()
 //-----------------------------------------
 //--- MAIN und erst mal Canvas erzeugen ---
 //-----------------------------------------
+
 $cx0 = MARGL;   // 00: Links unten, 11: Rechts oben
 $cx1 = $sizex - MARGR;
 $cy0 = $sizey - MARGB;
@@ -381,44 +382,50 @@ $cy1 = MARGT;
 $fxa = 1;    // Steilheit
 $fxb = 0;    // Offet der Umrechnung
 $bild = ImageCreate($sizex, $sizey);
-// Drei neutrale Farben erzeugen
-ImageColorAllocate($bild, 230, 245, 255); // Background (Lichtblau)
-$black = ImageColorAllocate($bild, 0, 0, 0); // Schwarz
-$white = ImageColorAllocate($bild, 255, 255, 255); // Schwarz
-$gray = ImageColorAllocate($bild, 225, 225, 225); // Hell-Grau fuer Grid
 
-// 16 Grundfarben festlegen, alles darueber ist modular
-$col[0] = ImageColorAllocate($bild, 255, 0, 0);  // Farben Rot
-$col[1] = ImageColorAllocate($bild, 0, 200, 0);  // Farben Gruen
-$col[2] = ImageColorAllocate($bild, 0, 0, 255);  // Farben Blau
-$col[3] = ImageColorAllocate($bild, 255, 0, 255);  // Farben Magenta
-$col[4] = ImageColorAllocate($bild, 255, 200, 0);  // Farben Orange
-$col[5] = ImageColorAllocate($bild, 0, 255, 200);  // Farben Indigo
-$col[6] = ImageColorAllocate($bild, 50, 255, 50);  // Hellgruen
-$col[7] = ImageColorAllocate($bild, 150, 150, 255);  // Hellblau
+try {
 
-$col[8] = ImageColorAllocate($bild, 255, 192, 203); // Pink
-$col[9] = ImageColorAllocate($bild, 165, 42, 42); // Braun
-$col[10] = ImageColorAllocate($bild, 255, 240, 0); // Yellow
-$col[11] = ImageColorAllocate($bild, 160, 32, 240);  // Purple
-$col[12] = ImageColorAllocate($bild, 127, 255, 212); // Aquamarin
-$col[13] = ImageColorAllocate($bild, 220, 200, 255); // Lavendel
-$col[14] = ImageColorAllocate($bild, 135, 206, 235); // Graublau
-$col[15] = ImageColorAllocate($bild, 154, 255, 50);  // Gelbgruen
+  // Drei neutrale Farben erzeugen
+  ImageColorAllocate($bild, 230, 245, 255); // Background (Lichtblau)
+  $black = ImageColorAllocate($bild, 0, 0, 0); // Schwarz
+  $white = ImageColorAllocate($bild, 255, 255, 255); // Schwarz
+  $gray = ImageColorAllocate($bild, 225, 225, 225); // Hell-Grau fuer Grid
 
-// CSV-Datei erst noch erstellen!
-read_csv($azoomy); // 1: Mit Autozoomy
+  // 16 Grundfarben festlegen, alles darueber ist modular
+  $col[0] = ImageColorAllocate($bild, 255, 0, 0);  // Farben Rot
+  $col[1] = ImageColorAllocate($bild, 0, 200, 0);  // Farben Gruen
+  $col[2] = ImageColorAllocate($bild, 0, 0, 255);  // Farben Blau
+  $col[3] = ImageColorAllocate($bild, 255, 0, 255);  // Farben Magenta
+  $col[4] = ImageColorAllocate($bild, 255, 200, 0);  // Farben Orange
+  $col[5] = ImageColorAllocate($bild, 0, 255, 200);  // Farben Indigo
+  $col[6] = ImageColorAllocate($bild, 50, 255, 50);  // Hellgruen
+  $col[7] = ImageColorAllocate($bild, 150, 150, 255);  // Hellblau
 
-draw_workspace(); // Flaeche vorbelegen
-set_zoom();   //
-draw_lines();
+  $col[8] = ImageColorAllocate($bild, 255, 192, 203); // Pink
+  $col[9] = ImageColorAllocate($bild, 165, 42, 42); // Braun
+  $col[10] = ImageColorAllocate($bild, 255, 240, 0); // Yellow
+  $col[11] = ImageColorAllocate($bild, 160, 32, 240);  // Purple
+  $col[12] = ImageColorAllocate($bild, 127, 255, 212); // Aquamarin
+  $col[13] = ImageColorAllocate($bild, 220, 200, 255); // Lavendel
+  $col[14] = ImageColorAllocate($bild, 135, 206, 235); // Graublau
+  $col[15] = ImageColorAllocate($bild, 154, 255, 50);  // Gelbgruen
 
-// Legende nicht zeichnen wenn nicht gewuenscht
-if (!(@$_GET['xl'])) draw_legend();
 
-// TEST: Enable to show all Colors
-// for($i=0;$i<17;$i++) Imagefilledrectangle($bild,$cx0+$i*10,$cy1,$cx0+$i*10+6,$cy1+20,$col[$i]);
-// ImageStringUp($bild,1,0,$sizey,"(C) Joembedded.de",$black);
+  // CSV-Datei erst noch erstellen!
+  read_csv($azoomy); // 1: Mit Autozoomy
 
-header("Content-type: image/png");
-ImagePng($bild);
+  draw_workspace(); // Flaeche vorbelegen
+  set_zoom();   //
+  draw_lines();
+
+  // Legende nicht zeichnen wenn nicht gewuenscht
+  if (!(@$_GET['xl'])) draw_legend();
+
+  // TEST: Enable to show all Colors
+  // for($i=0;$i<17;$i++) Imagefilledrectangle($bild,$cx0+$i*10,$cy1,$cx0+$i*10+6,$cy1+20,$col[$i]);
+  // ImageStringUp($bild,1,0,$sizey,"(C) Joembedded.de",$black);
+  header("Content-type: image/png");
+  ImagePng($bild);
+} catch (Exception $e) {
+  message($e->getMessage(), 1);
+}
