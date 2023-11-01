@@ -1,9 +1,9 @@
 <?PHP
 /* --------------CSVIEW.PHP --------------------------
 CSV - Online Viewer - (C) Joembedded.de
-V2.12 06.12.2020
+V2.20 02.11.2023
 ----
-  V2.12: Tested PHP8 and VS with intellisense
+  Tested PHP8 and VS with intellisense
 
   *** Requires GD-Library (php.ini: enable 'extention=gd' and PHP >= 5 *** 
 
@@ -52,10 +52,11 @@ function read_csv()
 
   $inf = fopen($dpath, "r");
   if (!$inf) error_message("Can't open File '$fname'");
+  if (fgets($inf, 4 /*OK, len-1*/) !== "\xef\xbb\xbf")  rewind($inf); // Skip BOM
 
   $title = $fname;
 
-  while ($line = fgetcsv($inf, 1000)) {
+  while ($line = fgetcsv($inf, 1000)) { // Achtung: Addiert BOM-Header (UTF-8)
     if ($line[0][0] == 'N') {
       $units = $line;
       $units[1] = "Events";       // Umnennen
@@ -144,7 +145,7 @@ if (strlen($info) < 10) {
 }
 
 $fname = '../' . S_DATA . "/stemp/t" . rand(10000, 99999) . time() . ".csv"; // unique_string
-file_put_contents($fname, $info);
+file_put_contents($fname, $info); // Might add UTF8-BOM */
 
 /*
 	 // header('Content-Type: text/plain'); //For Debug-Output
@@ -183,7 +184,7 @@ $anz = read_csv();
 <title><?PHP echo $title; ?> - CSView Online</title>
 
 <script type="text/javascript">
-  // Script (C) 2019 JoEmbedded.de
+  // Script (C) JoEmbedded.de
 
   // --- OPTIONAL DYNAMIC Data START ---
   var sizex = <?PHP echo $sizex; ?>; // Size Graphik (Default is 500x400)
@@ -580,7 +581,7 @@ $anz = read_csv();
         <span id="trace"></span>
       </td>
       <td style="font-family:Verdana,Arial,sans-serif; font-size:10px; text-align:right">
-        CSView V2.12
+        CSView V2.20
       </td>
     </tr>
   </table>
