@@ -24,9 +24,9 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 <!-- <link rel="stylesheet" href="css/w3.css"> -->
 
 <?php
-	// Legacy - device_lx.php Device View Script for LTrax. Details: see docu
+	// Legacy - device_lx.php Device View Script for LTX. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 0.54 14.10.2023
+	// Version: 0.55 04.11.2023
 	
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
@@ -227,19 +227,25 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			$asig[$tmp[0]] = $tmp[1];
 		}
 		echo $asig['dbm'] . " dbm";
+		$act = @$asig['act'];
+		if($act){
+			$acts = array("No/unkn.", "GSM", "GPRS", "EDGE", "LTE_M", "LTE_NB", "LTE");
+			$actn=@$acts[$act];
+			echo " ($actn)";
+		}
+
 		$sqs = 'k=' . G_API_KEY . "&s=$mac&lnk=1&mcc=" . $asig['mcc'] . "&net=" . $asig['net'] . "&lac=" . $asig['lac'] . "&cid=" . $asig['cid'];
 
 		if ($asig['ta'] == 255) $radius = "";
 		else $radius = "ca. " . ($asig['ta'] * 500 + 500) . " mtr ";
 
-		echo " - Device located " . $radius . "arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\" title=\"Estimated Position of last Cell Tower\">[Here]</a> ";
+		echo " - Device located " . $radius . "arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\" target=\"_blank\" title=\"Estimated Position of last Cell Tower\">[Here]</a>";
 
-		$sig=@$devi['signal'];
-		if($sig){
-			$mccs = substr($sig,4,3);
-			$country=@$mcca[intval($mccs)];
-			if(!$country) $country=$mcca[intval($mccs[0])]; // Fallback
-			echo " &nbsp; (<i>$country</i>) &nbsp; ";
+		$mcc=@$asig['mcc'];
+		if($mcc){
+			$country=@$mcca[intval($mcc)];
+			if(!$country) $country=$mcca[intval($mcc[0])]; // Fallback
+			echo "  &nbsp; (<i>$country</i>)";
 		}
 		echo "<br>";
 	}

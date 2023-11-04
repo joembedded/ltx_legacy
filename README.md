@@ -65,4 +65,6 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V2.01 18.10.2023 Cosmetics and FTP-push (only 'LTX_Server')
 - V2.10 19.10.2023 Decoding of compressed lines (starting with '$'+Base64) added
 - V2.20	02.11.2023 Legacy CSView UTF-8 cosmetics
+- V2.21	04.11.2023 Added Network Details (2G/4G/..) 
+
 
