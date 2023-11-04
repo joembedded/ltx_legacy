@@ -2,9 +2,9 @@
 /* --------------CSPLOT.PHP --------------------------
       CSV to IMAGE-Generator - (C) JoEmbedded.de
 
-      V2.12 06.12.2020
+      V2.20 02.11.2023
       ----
-      V2.12: Tested PHP8 and VS with intellisense
+      Tested PHP8 and VS with intellisense
 
       Requires GD-Library and PHP >= 5
 

@@ -302,8 +302,8 @@ for (;;) {
 				}
 				// Decide how much to uploade
 				if ($le > $la) {	// New Data?
-					if(defined("MAXUPLMEM")) $maxmem = MAXUPLMEM; // Limit Uploads 
-					else $maxmem = 20000;
+					if(!defined("MAXUPLMEM")) $maxmem = 20000;	// Limit Uploads 
+					else $maxmem = MAXUPLMEM; 
 					if ($le - $la > $maxmem) {
 						$la = $le - $maxmem;
 						$xlog .= "(WARNING: File:'$fname' Sizelimit $maxmem )";
@@ -414,7 +414,8 @@ for (;;) {
 			$cid = r4u_data($bp0 + 6);
 			$ta = ord($data[$bp0 + 10]);
 			$dbm = -ord($data[$bp0 + 11]);
-			$devi['signal'] = "mcc:$mcc net:$net lac:$lac cid:$cid ta:$ta dbm:$dbm";
+			$act = ($len>12)?ord($data[$bp0 + 12]):0;
+			$devi['signal'] = "mcc:$mcc net:$net lac:$lac cid:$cid ta:$ta dbm:$dbm act:$act";
 			if ($dbg) fwrite($of, "A5: Net: $mcc-$net-$lac-$cid T:$ta $dbm dbm\n");
 			$of2 = fopen("$dpath/conn_log.txt", 'a'); // Connection log
 			fputs($of2, gmdate("d.m.y H:i:s", $now) . ' UTC ' . $devi['signal'] . "\n");
@@ -762,11 +763,9 @@ if ($send_cmd <= 0) {
 }
 
 // Start Output with a last TEXT\n\n
-if (!isset($etext)) {
-	$etext = @file_get_contents("$dpath/cmd/okreply.cmd");
-	if (!$etext) $etext = "OK"; // Default
-	else $etext = substr(str_replace("\n", " ", $etext), 0, 40); // NL etc..
-}
+if (isset($vpnf) && !isset($etext)) {
+	$etext = substr(str_replace("\n", " ", @file_get_contents("$dpath/cmd/okreply.cmd")), 0, 40); // NL etc..
+} else $etext = "OK"; // Default
 echo "$etext(Id:$conid)\n\n"; // Default: OK
 
 if (!$expmore && strlen($ecmd) < 50) {	// If not: send at least curent server time

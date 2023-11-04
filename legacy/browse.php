@@ -1,6 +1,6 @@
 <?php
 // A small file browser for a given subdirectory for the
-// incomming LTrax data...
+// incomming LTX data...
 // Show Header in RED for filebrowser
 // (C) JoEmbedded.de
 //
@@ -23,7 +23,7 @@ if (!strcmp($api_key, L_KEY)) {
 <html>
 
 <head>
-	<title>Legacy LTrax Browser V1.10 </title>
+	<title>Legacy LTX Browser V1.10 </title>
 </head>
 
 <body>
@@ -48,8 +48,8 @@ if (!strcmp($api_key, L_KEY)) {
 	if (!$dir) $dir = S_DATA; 	// Default Dir is DATA
 
 	$anz = 0;
-	echo "<p><b><big><font color=\"red\">Legacy LTrax Browser V1.10 - Directory '$dir'</font></big></b><br></p>";
-	echo "<p><a href=\"index.php\">Legacy LTrax Home</a><br></p>";
+	echo "<p><b><big><font color=\"red\">Legacy LTX Browser V1.10 - Directory '$dir'</font></big></b><br></p>";
+	echo "<p><a href=\"index.php\">Legacy LTX Home</a><br></p>";
 
 	// --- Test if in allowed range ---
 	$minpath = substr(__DIR__, 0, strrpos(__DIR__, '/'));	// __DIR__ global Instllationi path

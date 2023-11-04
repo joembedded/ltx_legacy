@@ -34,14 +34,15 @@ if (strcasecmp($ext, ".txt")) {
 		$netx=@strpos($line,"net:");
 		$lacx=@strpos($line,"lac:");
 		$cidx=@strpos($line,"cid:");
-		$tax=@strpos($line,"ta:");
+		$acx=strpos($line,"act:");
 
 		$mcc=intval(substr($line,$mccx+4));
 		$net=intval(substr($line,$netx+4));
 		$lac=intval(substr($line,$lacx+4));
 		$cid=intval(substr($line,$cidx+4));
+		$act=($acx>0)?intval(substr($line,$acx+4)):0;
 
-		$ha="$mcc:$net:$lac:$cid";
+		$ha="$mcc:$net:$lac:$cid:$act";
 		@$cpcache[$ha]++;
 	}
 
@@ -50,26 +51,34 @@ if (strcasecmp($ext, ".txt")) {
 	$ccnt=1;
 	foreach($dataa as $line){
 		$lcnt++;
-		$mccx=@strpos($line,"mcc:");
 		echo "$lcnt: ";
-		$netx=@strpos($line,"net:");
-		$lacx=@strpos($line,"lac:");
-		$cidx=@strpos($line,"cid:");
-		$tax=@strpos($line,"ta:");
-		$dbx=@strpos($line,"dbm:");
+
+		$mccx=strpos($line,"mcc:");
+		$netx=strpos($line,"net:");
+		$lacx=strpos($line,"lac:");
+		$cidx=strpos($line,"cid:");
+		$tax=strpos($line,"ta:");
+		$dbx=strpos($line,"dbm:");
+		$acx=strpos($line,"act:");
 
 		$mcc=intval(substr($line,$mccx+4));
 		$net=intval(substr($line,$netx+4));
 		$lac=intval(substr($line,$lacx+4));
 		$cid=intval(substr($line,$cidx+4));
-		$dbm=intval(substr($line,$dbx+4));
+		$dbm=($dbx>0)?intval(substr($line,$dbx+4)):0;
+		$act=($acx>0)?intval(substr($line,$acx+4)):0;
 
-		$ha="$mcc:$net:$lac:$cid";	
+		$ha="$mcc:$net:$lac:$cid:$act";	
 		if($cpcache[$ha]>0){	// Jede Zelle nur EINMAL anzeigen
 			$utc=substr($line,0,$mccx);
 			echo "$utc mcc:$mcc net:$net lac:$lac cid:$cid ";
 
 			if($dbm!=0) echo "dbm:$dbm ";
+			if($act){
+				$acts = array("No/unkn.", "GSM", "GPRS", "EDGE", "LTE_M", "LTE_NB", "LTE");
+				$actn=@$acts[$act];
+				echo "($actn) ";
+			}
 
 			$ta=intval(substr($line,$tax+3));
 			if($ta==255) $tar="";
@@ -95,12 +104,15 @@ if (strcasecmp($ext, ".txt")) {
 			$utc=substr($line,0,$mccx);
 			echo "$utc ";
 			if($dbm!=0) echo "dbm:$dbm ";
+
+			$ta=intval(substr($line,$tax+3));
+			if($ta!=255) echo " ca. ".($ta*500+500)."mtr" ;	// in m
+
 			echo "(Cell($ncell))";	// Schon gezeigt, nur neue Zeit
 		}
 		echo "<br>";
 	}
 	
 	echo "-----END ------<br>";
-	
 	echo "</body></html>";
 }
