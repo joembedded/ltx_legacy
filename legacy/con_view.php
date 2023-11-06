@@ -85,8 +85,9 @@ if (strcasecmp($ext, ".txt")) {
 			else $tar= " ca. ".($ta*500+500)."mtr" ;	// in m
 
 			$sqs = 'k='.G_API_KEY."&s=$mac&lnk=1&mcc=$mcc&net=$net&lac=$lac&cid=$cid"; // Link
-		
-			echo " --- Cell($ccnt):" . $tar . " arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\">[Here]</a>";
+	
+
+			echo " &nbsp; Cell($ccnt):" . $tar . " arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\">[Here]</a>";
 
 			$country=@$mcca[$mcc];
 			if(!$country) $country=$mcca[intval($mcc/100)]; // Fallback
