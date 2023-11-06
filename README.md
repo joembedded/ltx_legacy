@@ -37,9 +37,9 @@ The optional 3.rd line is an URL where to send a PUSH notification on new data (
 The input script 'sw\ltu_trigger.php' will automatically remove older data.
 Change e.g. to "365\n100000" to allow only the last 365 days or max. 100000 lines per device.
 The file 'quota_days.dat' my be set to individual values per logger at any time.
-Optionally enable '//define ("MAXUPLMEM", 50000);': By default max. 20k are uploaded for files with Autosync (e.g. logger data) per transmission.
-For are transmission intervals at high logging intervals it should be increased to get always all data. )_
 
+LTX Microcloud adapts maximum upload size for files with Autosync (e.g. logger data) to Network speed (2G/LTE-M is faster than LTE-NB). Set the 2 defines() for "MAXM_2GM"/"MAXM_NB". Default 20k/5k Bytes.
+For are transmission intervals at high logging intervals it should be increased to get always all data.
 
 _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Key for the device via external 'KEY_SERVER_URL' is requred)_
 
@@ -66,5 +66,6 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V2.10 19.10.2023 Decoding of compressed lines (starting with '$'+Base64) added
 - V2.20	02.11.2023 Legacy CSView UTF-8 cosmetics
 - V2.21	04.11.2023 Added Network Details (2G/4G/..) 
+- V2.22 05.11.2023 Max. upload limit depending on Network, set defines(MAXM_xx) in 'api_key.inc.php!
 
 

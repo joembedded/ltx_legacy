@@ -1,7 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 11.10.2023 - V1.41 joembedded@gmail.com  - JoEmbedded.de
-
+// (C) 05.11.2023 - V1.41 joembedded@gmail.com  - JoEmbedded.de
 // Evtl. "schnelle Hilfe": error_reporting (E_ALL & ~E_DEPRECATED);
 
 error_reporting(E_ALL);
@@ -300,10 +299,11 @@ for (;;) {
 					$ln = $le - $la;
 					if ($dbg) fwrite($of, "- Already uploaded to Pos. $la, $ln Bytes new\n");
 				}
-				// Decide how much to uploade
+				// Decide how much to uploade, $act is known at this stage
+
 				if ($le > $la) {	// New Data?
-					if(!defined("MAXUPLMEM")) $maxmem = 20000;	// Limit Uploads 
-					else $maxmem = MAXUPLMEM; 
+					if(@$act==5) $maxmem = MAXM_NB;
+					else $maxmem = MAXM_2GM;
 					if ($le - $la > $maxmem) {
 						$la = $le - $maxmem;
 						$xlog .= "(WARNING: File:'$fname' Sizelimit $maxmem )";
