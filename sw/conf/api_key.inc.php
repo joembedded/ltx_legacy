@@ -26,5 +26,4 @@
 
 	// Only change with changes in the Firmware:
 	define ("D_API_KEY","LX1310"); // This the DEVICE-API_KEY to access the Server (used by Device's Firmware)
-
 ?>

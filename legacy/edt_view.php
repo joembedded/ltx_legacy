@@ -112,8 +112,7 @@ $dbg = 0;
 $mtmain_t0 = microtime(true);         // for Benchmark 
 
 $mac = @$_GET["s"];
-if (strlen($mac) != 16) {
-	if (strlen($mac) > 24) exit();		// URL Attacked?
+if (!isset($mac) || strlen($mac) != 16) {
 	exit_error("MAC Len");
 }
 $fname = @$_GET["f"];
