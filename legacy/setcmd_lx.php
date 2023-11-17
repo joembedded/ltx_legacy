@@ -32,8 +32,7 @@ $now = time(); // Sec ab 1.1.1970, GMT
 $fnames = @$_GET['f']; // 16 Chars, Uppercase
 $flen = intval(@$_GET['l']); // optional size (max 16)
 
-if (strlen($mac) != 16) {
-	if (strlen($mac) > 24) exit();		// URL Attacked?
+if (!isset($mac) || strlen($mac) != 16) {
 	exit_error("MAC Len");
 }
 

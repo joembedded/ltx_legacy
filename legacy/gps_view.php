@@ -28,8 +28,7 @@ if (!strcmp($api_key, L_KEY)) {
 $dbg = 0;
 
 $mac = @$_GET["s"];
-if (strlen($mac) != 16) {
-	if (strlen($mac) > 24) exit();		// URL Attacked?
+if (!isset($mac) || strlen($mac) != 16) {
 	exit_error("MAC Len");
 }
 $fname = @$_GET["f"];

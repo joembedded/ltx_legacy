@@ -32,8 +32,7 @@ $now = time(); // Sec ab 1.1.1970, GMT
 
 $uiname = @$_POST['uiname'];
 
-if (strlen($mac) != 16) {
-	if (strlen($mac) > 24) exit();		// URL Attacked?
+if (!isset($mac) || strlen($mac) != 16) {
 	exit_error("MAC Len");
 }
 

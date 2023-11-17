@@ -100,8 +100,7 @@ if (!empty($lfname)) {
 $token = @$_REQUEST['token'];
 if ($dbg) echo "*** DEBUG ***\nToken: '$token'\n";
 
-if (strlen($mac) != 16) {
-	if (strlen($mac) > 24) exit();		// URL Attacked?
+if (!isset($mac) || strlen($mac) != 16) {
 	exit_error("MAC Len");
 }
 // Never generate Updates for unexisting Loggers...

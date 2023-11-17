@@ -22,7 +22,6 @@ function r2u_data($dix)
 // ------ u32 to string BE ----
 function str_u32($uv32)
 {
-	global $data;
 	return pack("N", $uv32);
 }
 
@@ -92,7 +91,6 @@ $dfn = gmdate("Ymd_His", $now);		// 'disk_filename_from_now' (sortable)
 
 $send_cmd = -1;						// If set (0-255) send as Flags-cmd
 if (!isset($mac) || strlen($mac) != 16) {
-	if (strlen($mac) > 24) exit();		// URL Attacked?
 	exit_error("MAC Len");
 }
 
