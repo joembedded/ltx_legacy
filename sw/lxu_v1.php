@@ -94,16 +94,23 @@ if (!isset($mac) || strlen($mac) != 16) {
 	exit_error("MAC Len");
 }
 
-if (@file_exists(S_DATA . "/$mac/cmd/dbg.cmd")) {
+$dpath = S_DATA . "/$mac";				// Device Path global
+$xlog = "(lxu_v1)";
+
+if (@file_exists("$dpath/cmd/dbg.cmd")) {
 	if (!$dbg) $dbg = 1;
 }
 
+$dapikey = @file_get_contents("$dpath/dapikey.dat"); // false oder KEY
+if($dapikey === false){
+	include("conf/check_dapikey.inc.php"); // only on demand: check extern
+}
+
 // Check Key before loading data
-if (!$dbg && (!isset($api_key) || strcmp($api_key, D_API_KEY))) {
+if (!isset($api_key) || strcmp($api_key, $dapikey)) {
 	exit_error("API Key");
 }
 
-$xlog = "(lxu_v1)";
 if (empty($fname)) {
 	exit_error("No Data");
 }
@@ -115,15 +122,14 @@ $data = file_get_contents($fname);
 $maxlen = strlen($data);
 if ($maxlen < 16) exit_error("Empty Data");	// 16 is minimum
 if ($dbg) {	// log all incomming data local and also txt
-	$of = fopen(S_DATA . "/$mac/dbg/$dfn.dat", 'wb'); // first save data
+	$of = fopen("$dpath/dbg/$dfn.dat", 'wb'); // first save data
 	fwrite($of, $data);
 	fclose($of);
-	$of = fopen(S_DATA . "/$mac/dbg/$dfn.txt", 'w'); // then open txt
+	$of = fopen("$dpath/dbg/$dfn.txt", 'w'); // then open txt
 }
 
 $xlog .= "($maxlen Bytes Data)";
 
-$dpath = S_DATA . "/$mac";				// Device Path
 $stage = -1;	// Assume Stage no stage for this communication
 $expmore = 0; // Asume no reply
 $extratxt = "";	// Added ASCII (Quectel-Cache-Prob)
@@ -792,7 +798,7 @@ echo $ecmd;
 
 if ($dbg) {
 	if ($dbg > 1) show_str("ECMD: ", $ecmd);
-	$of2 = fopen(S_DATA . "/$mac/dbg/$dfn.ecmd", 'wb'); // save response
+	$of2 = fopen("$dpath/dbg/$dfn.ecmd", 'wb'); // save response
 	fwrite($of2, $ecmd);
 	fclose($of2);
 }

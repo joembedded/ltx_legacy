@@ -5,7 +5,7 @@
 // ---- basic directory service ---
 function check_dirs($wcmd = true)
 {
-	global $xlog, $dbg, $mac;
+	global $xlog, $dbg, $mac, $dapikey;
 	$sdata = S_DATA;
 
 	$newdev = false;
@@ -13,12 +13,12 @@ function check_dirs($wcmd = true)
 	if (!file_exists($sdata)) mkdir($sdata);  // MainDirectory
 	if (!file_exists($sdata . "/log")) mkdir($sdata . "/log");  // Logfiles
 	if(!isset($mac) || strlen($mac)!==16) return;	// No MAC
-
+	if($dapikey === false) return -1; // dir must exist
 	if (!file_exists($sdata . "/$mac")) {
-		// if(!$dbg) return -1;	// --- Without debug: dir must exist
 		mkdir($sdata . "/$mac");
 		file_put_contents($sdata . "/$mac/date0.dat", time()); // Note initial date
 		file_put_contents($sdata . "/$mac/quota_days.dat", DB_QUOTA); 
+		file_put_contents($sdata . "/$mac/dapikey.dat", $dapikey); 
 		$newdev = $wcmd;
 	}
 	if (!file_exists($sdata . "/$mac/cmd")) {

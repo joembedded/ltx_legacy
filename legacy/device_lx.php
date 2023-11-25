@@ -26,7 +26,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 <?php
 	// Legacy - device_lx.php Device View Script for LTX. Details: see docu
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// Version: 0.55 04.11.2023
+	// Version: 0.55 25.11.2023
 	
 	// todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 	// todo: maybe LOCK makes sense for several files
@@ -90,7 +90,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			// echo "Line: $line<br>";
 		}
 	}
-	$pasync = intval(@$devi['pasync']); // >0: Ayynchron with packets
+	$pasync = intval(@$devi['pasync']); // >0: Asynchron with packets (e.g. LTE-NB UDP only, LoRa, ..)
 	//--- Show avilabale infos ---
 	echo "</p><p><b>Device Info:</b><br>";
 
@@ -156,7 +156,9 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			else echo ", Push: (<i>not set</i>)";
 			echo " <a href=\"edit_quota.php?s=$mac\">[Edit Quota/Push ('quota_days.dat')]</a>";
 		}
+		$dapikey = @file_get_contents("$dpath/dapikey.dat"); // false oder KEY
 		echo "<br>";
+		if($dapikey!==false) echo "DApiKey: '$dapikey'<br>";
 	}
 
 	if (!$demo) {

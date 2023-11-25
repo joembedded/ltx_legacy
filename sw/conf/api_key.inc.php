@@ -24,6 +24,6 @@
 	define ("G_API_KEY","TESTTOKEN"); // This the API_KEY to access the GeoApi
 	define ("CELLOC_SERVER_URL","https://flexgate.org/ltx_api/gcells/gcells.php"); // Public implementation
 
-	// Only change with changes in the Firmware:
+	//define ("DAPIKEY_SERVER","http://localhost/ltx/sw/conf/_extern_check_dapikey.php"); // define/edit to use external D_API_KEY
 	define ("D_API_KEY","LX1310"); // This the DEVICE-API_KEY to access the Server (used by Device's Firmware)
 ?>

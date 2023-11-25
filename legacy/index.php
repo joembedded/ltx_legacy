@@ -23,8 +23,8 @@ if (!strcmp($api_key, L_KEY)) {
 }
 echo "<!DOCTYPE HTML><html><head>";
 
-if ($dev) $title = "LegacyLTX Develop-Login V0.54";
-else $title = "LegacyLTX Home and Guest/Demo-Login V0.54";
+if ($dev) $title = "LegacyLTX Develop-Login V0.55";
+else $title = "LegacyLTX Home and Guest/Demo-Login V0.55";
 
 $self = $_SERVER['PHP_SELF']; // Periodisch alle 30 Sekunden  auffrischen
 echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
@@ -43,7 +43,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	// dev.php DevPortal Script for LTrax. Details: see docu
 	// Only for Low-Level Developer Access!!!
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// V0.54 / 16.10.2023
+	// V0.55 / 25.11.2023
 	// todo: --- maybe LOCK makes sense for several files
 	if (!isset($self) || strlen($self) < 4) echo "WARNING: 'PHP_SELF' not set<br>";
 

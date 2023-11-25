@@ -15,21 +15,22 @@
 <head><title>Media-Browser</title></head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="privacy" content="This page is not using Cookies or collecting private data">
 	<link rel="stylesheet" href="w3.css">
 <body>
-
 
 <div class="w3-container">
 <?php
 	// A small file browser for a given subdirectory
-	// (C)2020 JoEmbedded.de - save as "index.php" (see '$me')
+	// (C)2020-2023 JoEmbedded.de - save as "index.php" (see '$me')
 	error_reporting(E_ALL);
 
 	$me="index.php";
 	// --- Convert to Timestring
-	function  secs2period($secs){
-		if($secs>=86400) return floor($secs/3600)."h";
-		return gmdate('H\h\r i\m\i\n s\s\e\c',$secs);
+	function  secs2period($now,$ftime){
+		$secs=$now-$ftime;
+		if($secs>86400) return gmdate('d. M Y',$ftime);
+		return "Age: ".gmdate('H\h\r i\m\i\n s\s\e\c',$secs);
 	}
 
 
@@ -60,7 +61,7 @@
 
 	addlog($dir);	// What is displayed?
 	
-	echo "<div class='w3-panel w3-indigo'><h3><b>Media-Browser - Directory '$dir'</b></h3></div>";
+	echo "<div class='w3-panel w3-indigo'><h3><img style=\"vertical-align:middle\" src=\"MediaIcon.ico\">&nbsp;&nbsp;&nbsp;<b>Media-Browser - Directory '$dir'</b></h3></div>";
 	
 	echo "<ul class='w3-ul w3-leftbar w3-border-green w3-hoverable w3-light-gray'>";
 	echo "<li><big>&#127968;</big>  <a href=\"index.php\">Home</a><br></li>";
@@ -118,6 +119,7 @@
 			if(stripos($file,'.css')) continue;
 			if(stripos($file,'.log')) continue;
 			if(stripos($file,'.js')) continue;
+			if(stripos($file,'.ico')) continue; // Icon erzeugen: z.B. https://favicon.io/
 			
 			// Source: z.B. https://emojiguide.org  und https://unicode.org/emoji/charts
 			if(stripos($file,'.txt')) $sym="&#128203;";
@@ -130,8 +132,8 @@
 
 			$ds=filesize("$dir/$file");
 			$dstot+=$ds;
-			$fa=secs2period($now-filemtime("$dir/$file"));
-			echo "<li><big>$sym</big> <a href=\"$dir/$file\">$file</a> <small><i> &nbsp;&nbsp;&nbsp;($ds Bytes, Age: $fa)</i></small></li>";
+			$fa=secs2period($now,filemtime("$dir/$file"));
+			echo "<li><big>$sym</big> <a href=\"$dir/$file\">$file</a> <small><i> &nbsp;&nbsp;&nbsp;($ds Bytes, $fa)</i></small></li>";
 			$anz++;
 		}
 		if($anz) echo "&nbsp;<small>($anz Files, total: $dstot Bytes)</small><br>";

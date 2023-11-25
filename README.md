@@ -40,6 +40,9 @@ The file 'quota_days.dat' my be set to individual values per logger at any time.
 
 LTX Microcloud adapts maximum upload size for files with Autosync (e.g. logger data) to Network speed (2G/LTE-M is faster than LTE-NB). Set the 2 defines() for "MAXM_2GM"/"MAXM_NB". Default 20k/5k Bytes.
 For are transmission intervals at high logging intervals it should be increased to get always all data.
+Please note: using SSL encryption if slow connections are enabled (LTE-NB) might work, but is not recommended.
+
+New in V.23: By default all devices use the same D_API_KEY. This OK for small or closed systems. Optionally new devices can use individual keys (attached to MAC and checked via external API) for larger systems.
 
 _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Key for the device via external 'KEY_SERVER_URL' is requred)_
 
@@ -67,5 +70,6 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V2.20	02.11.2023 Legacy CSView UTF-8 cosmetics
 - V2.21	04.11.2023 Added Network Details (2G/4G/..) 
 - V2.22 05.11.2023 Max. upload limit depending on Network, set defines(MAXM_xx) in 'api_key.inc.php!
+- V2.23 25.11.2023 If DAPIKEY_SERVER defined: indivdual external D_API_KEY check for each NEW device  (only once)
 
 
