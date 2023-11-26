@@ -156,9 +156,12 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			else echo ", Push: (<i>not set</i>)";
 			echo " <a href=\"edit_quota.php?s=$mac\">[Edit Quota/Push ('quota_days.dat')]</a>";
 		}
-		$dapikey = @file_get_contents("$dpath/dapikey.dat"); // false oder KEY
 		echo "<br>";
-		if($dapikey!==false) echo "DApiKey: '$dapikey'<br>";
+		if(defined("DAPIKEY_SERVER")){ // individual Key
+			$dapikey = @file_get_contents("$dpath/dapikey.dat"); // false oder KEY
+			if($dapikey === false) $dapikey="(<i>not set</i>)";
+			echo "DApiKey: '$dapikey'<br>";
+		}
 	}
 
 	if (!$demo) {
