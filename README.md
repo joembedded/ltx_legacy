@@ -71,6 +71,5 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V2.21	04.11.2023 Added Network Details (2G/4G/..) 
 - V2.22 05.11.2023 Max. upload limit depending on Network, set defines(MAXM_xx) in 'api_key.inc.php!
 - V2.23 25.11.2023 If DAPIKEY_SERVER defined: indivdual external D_API_KEY check for each NEW device  (only once)
-- V2.24 27.11.2023 Additional FTP-Export formats (sw/vpnf/ipush.php) ***inWork***
 
 

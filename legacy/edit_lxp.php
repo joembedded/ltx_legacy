@@ -81,7 +81,7 @@ $p200_beschr = array(	// sys_param.lxp
 	"Bat. Volts 100%[float]",
 	"Max Ringsize (Bytes)[1000..2e31]",
 	"mAmsec/Measure[0..1e9]",
-	"Mobile Protocol[0..255] B0:0/1:HTTP/HTTPS B1:VPF"
+	"Mobile Protocol[0..255] B0:0/1:HTTP/HTTPS B1:PRESET B2,3:TCP/UDPSetup"
 );
 
 
