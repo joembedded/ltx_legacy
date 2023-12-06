@@ -73,3 +73,4 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V2.23 25.11.2023 If DAPIKEY_SERVER defined: indivdual external D_API_KEY check for each NEW device  (only once)
 
 
+
