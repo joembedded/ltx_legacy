@@ -7,7 +7,7 @@
 	define ("S_API_KEY","xSintXtl"); 	// This the Server's Internal-API_KEY (for triggers, auto-cleanup,..) (keep secret!!!)
 	define ("S_DATA","../data_secret");	// Server's ***SECRET*** data directory (could be secret or (later) dynamic (e.g. from database)
 	
-	define ("DB_QUOTA","90\n1000"); // Default Quota for new Devices (if Database is used: 'Days\nLines')
+	define ("DB_QUOTA","90\n1000"); // Default Quota for new Devices (if Database is used: 'Days\nLines') opt. with Webhook(PushPull)
 	define ("L_KEY","LegacyLTX");	// legacyKey for ***LEGACY Login***
 	define ("MAXM_2GM", 20000);	// max. auto upload limit for 2G/LTE-M
 	define ("MAXM_NB", 5000);	// LTE-NB is slow
