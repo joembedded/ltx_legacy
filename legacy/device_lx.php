@@ -375,16 +375,16 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 				if ($ffstat['len'] != $fostat['vd_len']) echo " LENGTH";
 				if ($ffstat['date'] != $fostat['vd_date']) echo " TIMESTAMP";
 			}
-			echo ')';
+			echo ') ';
 		}
 		if ($loflen > 0) { // Size 0 makes no sense
-			echo " <a href=\"view.php?s=$mac&f=files/$fname\" title=\"View raw content of File\">[Open local]</a> ";
 			// Check Extensions: EDT .EasyDaTa
 			if (strpos($fname, '.edt')) { // if pos 0 is allowed: use !== false..
+				echo "<a href=\"view.php?s=$mac&f=files/$fname\" title=\"View raw content of File\">[Open local]</a> ";
 				echo "<a href=\"edt_view.php?s=$mac&f=$fname\" title=\"View as CSV (Text)\">[View CSV]</a> ";
 				echo "<a href=\"edt_view.php?s=$mac&f=$fname&o=135\" title=\"Download as CSV, Float Format: German\">[CSV(D)]</a> ";
 				echo "<a href=\"edt_view.php?s=$mac&f=$fname&o=131\" title=\"Download as CSV, Float Format: International\">[CSV(Int)]</a> ";
-				echo "<a href=\"csview/csview.php?s=$mac&f=$fname\" title=\"Graphical View Online\">[CSVIEW]</a>&nbsp;&nbsp;"; // Space wg. DELETE
+				echo "<a href=\"csview/csview.php?s=$mac&f=$fname\" title=\"Graphical View Online\">[CSVIEW]</a> "; // Space wg. DELETE
 				echo "<a href=\"gps_view.php?s=$mac&f=$fname\" title=\"View as GPS (Map)\">[GPSVIEW]</a> ";
 			} else {
 				if (!$demo) {
@@ -419,22 +419,21 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo "<br>";
 	}
 
-
 	// Now list other files
 	foreach ($phflist as $phfname) {
 		if (!strlen($phfname) || !strcmp($phfname, ".") || !strcmp($phfname, "..")) continue;
 
-		if (!$pasync) echo "( '$phfname': " . filesize("$dpath/files/$phfname") . " Bytes (Backup)))";
-		else echo "$phfname': " . filesize("$dpath/files/$phfname") . " Bytes &nbsp; ";
-		echo " <a href=\"view.php?s=$mac&f=files/$phfname\" title=\"View raw content of File as Text\">[Open local]</a> ";
-		// Check Extensions: EDT .EasyDaTa
+		if (!$pasync) echo "( '$phfname': " . filesize("$dpath/files/$phfname") . " Bytes (Backup))) ";
+		else echo "$phfname': " . filesize("$dpath/files/$phfname") . " Bytes ";
 
+		// Check Extensions: EDT .EasyDaTa
 		if (strpos($phfname, '.edt')) {
+			echo "<a href=\"view.php?s=$mac&f=files/$phfname\" title=\"View raw content of File as Text\">[Open local]</a> ";
 			echo "<a href=\"edt_view.php?s=$mac&f=$phfname\" title=\"View as CSV (Text)\">[View CSV]</a> ";
 			echo "<a href=\"edt_view.php?s=$mac&f=$phfname&o=135\" title=\"Download as CSV, Float Format: German\">[CSV(D)]</a> ";
 			echo "<a href=\"edt_view.php?s=$mac&f=$phfname&o=131\" title=\"Download as CSV, Float Format: International\">[CSV(Int)]</a> ";
 			echo "<a href=\"csview/csview.php?s=$mac&f=$phfname\" title=\"Graphical View Online\">[CSVIEW]</a>";
-		} else if ($pasync && strpos($phfname, '.lxp') > 0) {
+		} else if ($pasync && strpos($phfname, '.lxp') > 0 && !$demo) {
 			echo " <a href=\"edit_lxp.php?s=$mac&f=files/$phfname\" title=\"Edit raw content of File as Text\">[Edit]</a> ";
 		}
 		if (!$demo) echo "&nbsp;&nbsp;<a href=\"unlink_lx.php?s=$mac&f=files/$phfname\">[DEL]</a>)"; // 4 tries
