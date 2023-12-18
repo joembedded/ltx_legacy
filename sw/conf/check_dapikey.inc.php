@@ -1,13 +1,14 @@
 <?php
-// Set initial D_API_KEY for this mac - ONLY included if $dapikey is not set for this MAC
+// Set initial D_API_KEY for this mac - ONLY included if $dapikey is not set/different for this MAC
 // ** internal PART **
 // 2 Versions possible A.)/B.)
 // Info: global
 
 if(!defined("DAPIKEY_SERVER")){
 // A.) Simple: Use same D_API_KEY for all devices
-	$dapikey = D_API_KEY;
 	$xlog .= "(Use Default D_API_KEY)";
+	$dapikey = D_API_KEY;
+	$daksave = true;	// Save after creating Dirs
 }else{
 // B.) Individual: Via external API for predefined MAC/D_API_KEY pairs via CURL
 	$qgetkey = DAPIKEY_SERVER."?k=".S_API_KEY."&d=$api_key&s=$mac";
@@ -26,6 +27,7 @@ if(!defined("DAPIKEY_SERVER")){
 	if(!isset($cres) || strcmp($cres,"CHECK OK")){
 		exit_error("API Key Check Invalid");
 	}
-	$dapikey = $api_key;	// Key from Device was OK. Store it.
+	$dapikey = $api_key;	// Key from Device was OK
+	$daksave = true;	// Save after creating Dirs
 }	
 ?>

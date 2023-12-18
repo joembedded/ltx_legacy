@@ -1,6 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 05.11.2023 - V1.41 joembedded@gmail.com  - JoEmbedded.de
+// (C) 11.12.2023 - V1.41 joembedded@gmail.com  - JoEmbedded.de
 // Evtl. "schnelle Hilfe": error_reporting (E_ALL & ~E_DEPRECATED);
 
 error_reporting(E_ALL);
@@ -100,22 +100,15 @@ $xlog = "(lxu_v1)";
 if (@file_exists("$dpath/cmd/dbg.cmd")) {
 	if (!$dbg) $dbg = 1;
 }
-
+if (!isset($api_key)) exit_error("API Key"); // Required
 $dapikey = @file_get_contents("$dpath/dapikey.dat"); // false oder KEY
-if($dapikey === false){
-	include("conf/check_dapikey.inc.php"); // only on demand: check extern
+if ($dapikey === false || strcmp($api_key, $dapikey)) { //
+	include("conf/check_dapikey.inc.php"); // only on demand: check extern, opt. set daksave
+	if ($dapikey === false || strcmp($api_key, $dapikey)) exit_error("API Key");
 }
-
-// Check Key before loading data
-if (!isset($api_key) || strcmp($api_key, $dapikey)) {
-	exit_error("API Key");
-}
-
-if (empty($fname)) {
-	exit_error("No Data");
-}
-
+if (empty($fname)) exit_error("No Data");
 if (check_dirs()) exit_error("Error (Directory/MAC not found)");
+if (isset($daksave)) file_put_contents("$dpath/dapikey.dat", $dapikey); // Update Key
 
 $data = file_get_contents($fname);
 
@@ -306,7 +299,7 @@ for (;;) {
 				// Decide how much to uploade, $act is known at this stage
 
 				if ($le > $la) {	// New Data?
-					if(@$act==5) $maxmem = MAXM_NB;
+					if (@$act == 5) $maxmem = MAXM_NB;
 					else $maxmem = MAXM_2GM;
 					if ($le - $la > $maxmem) {
 						$la = $le - $maxmem;
@@ -418,7 +411,7 @@ for (;;) {
 			$cid = r4u_data($bp0 + 6);
 			$ta = ord($data[$bp0 + 10]);
 			$dbm = -ord($data[$bp0 + 11]);
-			$act = ($len>12)?ord($data[$bp0 + 12]):0;
+			$act = ($len > 12) ? ord($data[$bp0 + 12]) : 0;
 			$devi['signal'] = "mcc:$mcc net:$net lac:$lac cid:$cid ta:$ta dbm:$dbm act:$act";
 			if ($dbg) fwrite($of, "A5: Net: $mcc-$net-$lac-$cid T:$ta $dbm dbm\n");
 			$of2 = fopen("$dpath/conn_log.txt", 'a'); // Connection log
