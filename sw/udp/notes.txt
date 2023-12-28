@@ -1,0 +1,69 @@
+# For Server joembedded.eu:
+# =========================
+
+# Generate/Test UDPServerGeneral.c:
+# ---------------------------------
+cd /var/www/vhosts/joembedded.eu/httpdocs/ltx/sw/udp
+gcc udpsg.c -o udpsg -lcurl
+./udpsg -v
+
+
+# Script-Test:
+# ------------
+http://joembedded.eu/ltx/sw/udp/payload_minimal.php?p=0011223344556677
+https://joembedded.eu/ltx/sw/udp/payload_minimal.php?p=0011223344556677
+
+
+
+# Install UDPServerGeneral as Service
+# -----------------------------------
+# Infos(DE): https://wiki.ubuntuusers.de/Howto/systemd_Service_Unit_Beispiel/
+#      (EN): https://medium.com/@benmorel/creating-a-linux-service-with-systemd-611b5c8b91d6
+# Only Services are constantly available
+
+cd /etc/systemd/system
+nano ltx_udpsd.service
+
+-------NANO:File ltx_udpsd.service-------
+[Unit]
+Description=UDPServerGeneral - LTX UDP-Gateway
+After=network-online.target
+
+[Service]
+User=www-data
+Type=simple
+ExecStartPre=/bin/echo "LTX UDP-Gateway start..."
+ExecStart=/var/www/vhosts/joembedded.eu/httpdocs/ltx/sw/udp/udpsg
+ExecStartPost=/bin/echo "OK, LTX UDP-Gateway ready!"
+#Optional:
+#Restart=always
+
+[Install]
+WantedBy=multi-user.target
+------------------
+
+# Save with: Ctrl-X , Y
+# Activate Service Unit[1][3] (only once)
+systemctl enable ltx_udpsd.service
+
+# Start Service
+systemctl start ltx_udpsd.service
+
+# After changes reload services:
+systemctl daemon-reload
+
+# ***Now it will be present! ***
+
+# Optionally Stop Service:
+systemctl stop ltx_udpsd.service
+
+# Test Service staus:
+# Simple Reply (active/inactive)
+systemctl is-active  ltx_udpsd.service
+# All entries (Exit: 'q')
+systemctl status ltx_udpsd.service
+
+# All Output of the service will be recorded in /var/logs/syslog ;-)
+
+***
+
