@@ -43,7 +43,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	// dev.php DevPortal Script for LTrax. Details: see docu
 	// Only for Low-Level Developer Access!!!
 	// (C)joembedded@gmail.com  - jomebedded.de
-	// V0.55 / 25.11.2023
+	// V0.56 / 20.01.2024
 	// todo: --- maybe LOCK makes sense for several files
 	if (!isset($self) || strlen($self) < 4) echo "WARNING: 'PHP_SELF' not set<br>";
 

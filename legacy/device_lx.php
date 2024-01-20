@@ -113,7 +113,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	echo "Last Contact: $fage";
 
 	echo " - Reason: ";
-	$reason = $devi['reason'];
+	$reason = @$devi['reason'];
 	switch ($reason & 15) { //
 			//case 1:	echo "RADIO"; break;
 		case 2:
@@ -137,11 +137,11 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 	}
 
 	if (!$pasync) {
-		$dt = $devi['sdelta'];  // $devi['dtime']-$devi['now']; different for long transfers
+		$dt = @$devi['sdelta'];  // $devi['dtime']-$devi['now']; different for long transfers
 		echo "Deviation to Server: $dt secs<br>";
 	}
 
-	echo "Transmission Count (All/OK): " . $devi['conns'] . '/' . @$devi['trans'] . '<br>';
+	echo "Transmission Count (All/OK): " . @$devi['conns'] . '/' . @$devi['trans'] . '<br>';
 
 	if (defined("DB_NAME")) {
 		$quota = @file("$dpath/quota_days.dat", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
