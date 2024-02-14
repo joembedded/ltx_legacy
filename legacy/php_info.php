@@ -16,4 +16,11 @@ if (!$dev) {
 	exit();
 }
 
+$ip = $_SERVER["REMOTE_ADDR"];  
+$host = gethostbyaddr($ip);
+
+echo "Remote IP: '$ip' ";  
+echo "Hostname: '$host'";  
+echo "<hr>";
+
 phpinfo();
