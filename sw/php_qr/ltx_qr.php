@@ -1,5 +1,5 @@
 <?php 
-// QR-Generator PHP
+// QR-Generator PHP - Stand 26.02.24
 
 // Quelle: https://www.geeksforgeeks.org/dynamically-generating-a-qr-code-using-php/
 // Include the qrlib file 
@@ -13,6 +13,9 @@
 // When this function has only the 
 // text parameter it directly 
 // outputs QR in the browser 
+// Test: http://localhost/ltx/sw/php_qr/ltx_qr.php?text=Hallo%20Welt&ecc=M
+// Test: https://joembedded.de/ltx/sw/php_qr/ltx_qr.php?text=Hallo%20Welt&ecc=M
+
 
   // Parameters:
   $text=@$_REQUEST['text'];
