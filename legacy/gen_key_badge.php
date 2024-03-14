@@ -109,7 +109,7 @@ if (!file_exists(S_DATA . "/$mac") || check_dirs()) exit_error("Error (Directory
 <body>
 	<?php
 
-	$xlog .= "(Generating Badge)";
+	$xlog = "(Generating Badge)";
 
 	$dpath = S_DATA . "/$mac/cmd/";
 	@include("$dpath/def_factory_key.php"); // If available: Use it
