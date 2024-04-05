@@ -388,6 +388,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 				echo "<a href=\"gps_view.php?s=$mac&f=$fname\" title=\"View as GPS (Map)\">[GPSVIEW]</a> ";
 			} else {
 				if (!$demo) {
+					echo "<a href=\"view.php?s=$mac&f=files/$fname\" title=\"View raw content of File\">[Open local]</a> ";
 					if (strpos($fname, '.lxp') > 0) echo " <a href=\"edit_lxp.php?s=$mac&f=files/$fname\" title=\"Edit raw content of File as Text\">[Edit]</a> ";
 				}
 			}
