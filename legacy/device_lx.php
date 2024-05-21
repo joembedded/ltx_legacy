@@ -563,7 +563,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			echo "<a href=\"server_cmd_form.php?s=$mac\">Send Server Command (Byte)</a>";
 			if (@file_exists(S_DATA . "/$mac/cmd/server.cmd")) {
 				$server_cmd = file_get_contents(S_DATA . "/$mac/cmd/server.cmd");
-				$scmd_val = ord($server_cm[0]);
+				$scmd_val = ord($server_cmd[0]);
 				echo " (Pending: '$scmd_val' ";
 				echo " <a href=\"unlink_lx.php?s=$mac&f=cmd/server.cmd\">[Remove]</a> )";
 			}
