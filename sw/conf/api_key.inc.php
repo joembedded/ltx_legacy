@@ -26,7 +26,8 @@
 
 	//define ("DAPIKEY_SERVER","http://localhost/ltx/sw/conf/_extern_check_dapikey.php"); // define/edit to use external D_API_KEY
 	define ("D_API_KEY","LX1310"); // This the DEVICE-API_KEY to access the Server (used by Device's Firmware)
+
+	define ("OBX_ACCESS","xxx\nxxx"); 	// ORBCOMM Credentials access_id\npassword
 	
-	define ("OBX_ACCESS","access_id=X&password=X"); 	// ORBCOMM Credentials
 
 ?>
