@@ -89,7 +89,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	$anz = 0;
 	foreach ($list as $file) {
 		if ($file == '.' || $file == '..') continue;
-		if ($file == 'log' || $file == 'stemp') continue;	// log and stemp not listed
+		if (!ctype_xdigit($file)) continue;	
 		if (!is_dir("./$dir/$file")) continue;	// Should not be, but..
 		if (!$dev && !@file_exists(S_DATA . "/$file/demo.cmd")) continue;
 

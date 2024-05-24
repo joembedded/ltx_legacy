@@ -254,6 +254,14 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		}
 		echo "<br>";
 	}
+	if (!empty($devi['pos'])) {
+		$pstr = $devi['pos'];
+		$posa = explode(' ',$pstr); // SRC lat lng add
+		$lat = $posa[1];
+		$lng = $posa[2];
+		$page = secs2period($now - $devi['pos_ts']);
+		echo "Position: <a href='http://maps.google.com/maps?f=q&q=$lat,$lng&z=12' target='_blank'>[$pstr]</a> Age:$page<br>";
+	}
 
 	if (!empty($devi['lut_cont'])) {
 		$lut_dstr = gmdate("d.m.Y H:i:s", $devi['lut_date']);
