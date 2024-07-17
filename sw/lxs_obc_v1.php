@@ -549,11 +549,12 @@ for (;;) { // break-Dummy
 	foreach ($msgs as $msg) {
 		$mid = $msg->ID;	// ID der Msg (only relevant for dbg)
 		$modemsno = $msg->MobileID;	// SNO of modem - Key
+		$dsize = @$msg->OTAMessageSize;
 		$thism = @$modem_list[$modemsno];
-		if (!isset($thism)) $modem_list[$modemsno] = array(1, 15, 0);	// 1 Cnts, unknown reason, 0 Bytes
+		if (!isset($thism)) $modem_list[$modemsno] = array(1, 15, $dsize);	// 1 Cnts, unknown reason, 0 Bytes
 		else {
-			$modem_list[$modemsno][0]++;
-			$modem_list[$modemsno][2] += @$msg->OTAMessageSize;
+			$modem_list[$modemsno][0]++; // Cnt
+			$modem_list[$modemsno][2] += $dsize;
 		}
 		$sin = $msg->SIN;
 		$mutc = $msg->MessageUTC;
@@ -642,6 +643,7 @@ foreach ($modem_list as $msno => $mtmp) {
 	} else {
 		$devi['quota_in'] += $maxlen;
 	}
+
 	$ccnt = @$devi['trans'];
 	if (!isset($ccnt)) $ccnt = 1;
 	else $ccnt++;

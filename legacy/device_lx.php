@@ -205,6 +205,10 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 			}
 		} else {
 			echo "Device Type: " . $devi['typ'] . " (No Disk)<br>";
+			echo "SIM (ICCID) / MODEM: ";
+			if (!empty($devi['imsi'])) echo "'" . $devi['imsi'] . "'<br>";
+			else echo "(unknown)<br>";
+
 		}
 	}
 
