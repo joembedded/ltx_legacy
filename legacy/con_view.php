@@ -1,7 +1,7 @@
 <?PHP
 // -------------------------------------------------------------------
 // con_view.php - Connection Viewer (filtered)
-// 28.06.2022
+// 20.07.2024
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -67,7 +67,7 @@ if (strcasecmp($ext, ".txt")) {
 		$cid=intval(substr($line,$cidx+4));
 		$dbm=($dbx>0)?intval(substr($line,$dbx+4)):0;
 		$act=($acx>0)?intval(substr($line,$acx+4)):0;
-
+		if($act==2 || $act=3) $act=1;	// Allg. 2G
 		$ha="$mcc:$net:$lac:$cid:$act";	
 		if($cpcache[$ha]>0){	// Jede Zelle nur EINMAL anzeigen
 			$utc=substr($line,0,$mccx);
@@ -75,7 +75,7 @@ if (strcasecmp($ext, ".txt")) {
 
 			if($dbm!=0) echo "dbm:$dbm ";
 			if($act){
-				$acts = array("No/unkn.", "GSM", "GPRS", "EDGE", "LTE_M", "LTE_NB", "LTE");
+				$acts = array("No/unkn.", "2G", "_GPRS", "_EDGE", "LTE_M", "LTE_NB", "_LTE");
 				$actn=@$acts[$act];
 				echo "($actn) ";
 			}
