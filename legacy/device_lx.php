@@ -238,7 +238,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 		echo $asig['dbm'] . " dbm";
 		$act = @$asig['act'];
 		if($act){
-			$acts = array("No/unkn.", "GSM", "GPRS", "EDGE", "LTE_M", "LTE_NB", "LTE");
+			$acts = array("No/unkn.", "GSM", "GPRS", "EDGE", "LTE_M", "LTE_NB", "LTE", "ANY");
 			$actn=@$acts[$act];
 			echo " ($actn)";
 		}
