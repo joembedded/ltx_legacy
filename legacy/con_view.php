@@ -24,7 +24,7 @@ if (strcasecmp($ext, ".txt")) {
 } else {
 	$dataa =  file($rfile,FILE_IGNORE_NEW_LINES);
 	$anz = count($dataa);
-	echo "<!DOCTYPE HTML><html><body>";
+	echo "<!DOCTYPE HTML><html>	<style>	table, th, td {	  border: 1px solid black;	 border-collapse: collapse;	} </style>	<body>";
 
 	echo "---------------- Connections: '$mac/$fname': $anz Lines: --------------<br>";
 	// Scan connected Cells:
@@ -41,12 +41,35 @@ if (strcasecmp($ext, ".txt")) {
 		$lac=intval(substr($line,$lacx+4));
 		$cid=intval(substr($line,$cidx+4));
 		$act=($acx>0)?intval(substr($line,$acx+4)):0;
-
+		if($act==2 || $act==3) $act=1;	// Allg. 2G
 		$ha="$mcc:$net:$lac:$cid:$act";
 		@$cpcache[$ha]++;
 	}
 
-	echo "No. of different Cells: ".count($cpcache)."<br>";
+
+	echo "<table>";
+	echo "<tr> <th>Cells (".count($cpcache).")</th> <th>Used</th> <th>Pos</th> </tr>";
+	$i=1;
+	foreach($cpcache as $cell=>$ccnt){
+		$ccom=explode(":",$cell);
+		$mcc=$ccom[0];
+		$mnc=$ccom[1];
+		$lac=$ccom[2];
+		$cid=$ccom[3];
+		$act=$ccom[4];
+		$acts = array("No/unkn.", "2G", "_GPRS", "_EDGE", "LTE_M", "LTE_NB", "_LTE");
+		$actn=@$acts[$act];
+
+		$country=@$mcca[$mcc];
+		if(!$country) $country=$mcca[intval($mcc/100)]; // Fallback
+
+		$sqs = 'k='.G_API_KEY."&s=$mac&lnk=1&mcc=$mcc&net=$net&lac=$lac&cid=$cid"; // Link
+		echo "<tr> <td>$i: $mcc-$net-$lac-$cid ($actn) (<i>$country</i>) </td> <td> $ccnt </td> <td><a target='_blank' href=\"" . CELLOC_SERVER_URL . "?$sqs\">[Here]</a></td> </tr>";
+		$i++;
+	}
+	echo "</table>";
+
+
 	$lcnt=0;
 	$ccnt=1;
 	foreach($dataa as $line){
@@ -60,14 +83,14 @@ if (strcasecmp($ext, ".txt")) {
 		$tax=strpos($line,"ta:");
 		$dbx=strpos($line,"dbm:");
 		$acx=strpos($line,"act:");
-
 		$mcc=intval(substr($line,$mccx+4));
 		$net=intval(substr($line,$netx+4));
 		$lac=intval(substr($line,$lacx+4));
 		$cid=intval(substr($line,$cidx+4));
+
 		$dbm=($dbx>0)?intval(substr($line,$dbx+4)):0;
 		$act=($acx>0)?intval(substr($line,$acx+4)):0;
-		if($act==2 || $act=3) $act=1;	// Allg. 2G
+		if($act==2 || $act==3) $act=1;	// Allg. 2G
 		$ha="$mcc:$net:$lac:$cid:$act";	
 		if($cpcache[$ha]>0){	// Jede Zelle nur EINMAL anzeigen
 			$utc=substr($line,0,$mccx);
@@ -89,9 +112,6 @@ if (strcasecmp($ext, ".txt")) {
 
 			echo " &nbsp; Cell($ccnt):" . $tar . " arround <a href=\"" . CELLOC_SERVER_URL . "?$sqs\">[Here]</a>";
 
-			$country=@$mcca[$mcc];
-			if(!$country) $country=$mcca[intval($mcc/100)]; // Fallback
-			echo " (<i>$country</i>)";
 
 		/* Ask DB for each line is SLOW 
 		$sqs = 'k='.G_API_KEY."&s=$mac&lnk=0&mcc=$mcc&net=$net&lac=$lac&cid=$cid"; // No Link

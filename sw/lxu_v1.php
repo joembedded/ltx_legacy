@@ -1,6 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 11.12.2023 - V1.41 joembedded@gmail.com  - JoEmbedded.de
+// (C) 06.09.2024 - V1.42 joembedded@gmail.com  - JoEmbedded.de
 // Evtl. "schnelle Hilfe": error_reporting (E_ALL & ~E_DEPRECATED);
 
 error_reporting(E_ALL);
@@ -777,13 +777,10 @@ if ($send_cmd >= 0) { // preset to -1
 	$ecmd .= $tecmd . str_u32((~crc32($tecmd)) & 0xFFFFFFFF); // Append CRC
 }
 
-if ($expmore) $recmd = "\xFE:ServerRepeat**"; 	// Repeat
-else $recmd = "\xFF:ServerDone****"; // OK
 $ecmd .= $extratxt;
+if ($expmore) $ecmd .= "\xFE:More"; 
+else $ecmd .= "\xFF:Done"; 
 $elen = strlen($ecmd);
-$aesgap = 16 - ($elen & 15); // Add 1..16 Bytes (but at least 1)
-$ecmd .= substr($recmd, 0, $aesgap); // prepare pption for HTTP-AES
-$elen += $aesgap;
 
 $xlog .= "($elen Bytes Reply)";
 $devi['quota_out'] += $elen; // Save Quota out
