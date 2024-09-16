@@ -1,11 +1,11 @@
 <?php
 	// ---- Blanco File for CUSTOMERS ---
 	// api_key.php - Include File, holding API-Keys. 'include'
-	// Key stored as defines to prevent access via webserver
+	// Key stored as defines to prevent access via webserver (marked as '***SECRET***'  set to own values!)
 	
 	// *** Change Directory for S_DATA and internal access key to prevent external call of scripts!!! ***
-	define ("S_API_KEY","xSintXtl"); 	// This the Server's Internal-API_KEY (for triggers, auto-cleanup,..) (keep secret!!!)
-	define ("S_DATA","../data_secret");	// Server's ***SECRET*** data directory (could be secret or (later) dynamic (e.g. from database)
+	define ("S_API_KEY","xSintXtl"); 	// This the Server's Internal-API_KEY (for triggers, auto-cleanup,..) (keep ***SECRET***!!!)
+	define ("S_DATA","../data_secret");	// Server's ***SECRET*** data directory 
 	
 	define ("DB_QUOTA","90\n1000"); // Default Quota for new Devices (if Database is used: 'Days\nLines') opt. with Webhook(PushPull)
 	define ("L_KEY","LegacyLTX");	// legacyKey for ***LEGACY Login***
@@ -25,7 +25,7 @@
 	define ("CELLOC_SERVER_URL","https://flexgate.org/ltx_api/gcells/gcells.php"); // Public implementation
 
 	//define ("DAPIKEY_SERVER","http://localhost/ltx/sw/conf/_extern_check_dapikey.php"); // define/edit to use external D_API_KEY
-	define ("D_API_KEY","LX1310"); // This the DEVICE-API_KEY to access the Server (used by Device's Firmware)
+	define ("D_API_KEY","LX1310"); // This the DEVICE-API_KEY to access the Server (used by Device's Firmware) (keep ***SECRET***!!!)
 
 	define ("OBX_ACCESS","xxx\nxxx"); 	// ORBCOMM Credentials access_id\npassword
 	
