@@ -19,16 +19,16 @@ The input script '../sw/ltu_trigger.php' will add the data (feel free to modify 
 ***Installation:*** 
 
  1. Simply copy all to your server, Server must run HTTP (by default port 80). It is a good idea to make the Server reachable by HTTP and HTTPS with the same name (see 5.).
- (Data transfer via HTTP for (devices/loggers) takes much less energy than HTTPS (optionally on request devices can also use HTTP-AES128-VPN or HTTPS).
+ (Data transfer via HTTP for (devices/loggers) takes much less energy than HTTPS (optionally on request devices can also use HTTPS), hence we recommend HTTP for communication Server<->Loggers, but HTTPS for user access.
 
- 2. Modify './sw/conf/api_key.inc.php' as in comments (at least set a 'secret' data directory 'S_DATA' and an own 'L_KEY')
+ 2. Modify './sw/conf/api_key.inc.php' as in comments (averything marked '*** SECRET ***' and at least set a 'secret' data directory 'S_DATA' and an own 'L_KEY')
 
  3. Set your Server name and path in the 'sys_param.lxp' file on the devices/loggers.
 
  4. Make a test transmission
  
  5. Log in to Legacy 'https://SERVER.XYZ/xxx/legacy/index.html'
- (Hint: for fast access bookmark it like this: https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY)
+ (Hint: for fast access bookmark it like this: https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY (YOURLKEY: your L_KEY from api_key.inc.php)
 
 _(Just as Info: In case of "LTX_Server" all new data will be written to the database. There is a quota limit in
 './sw/conf/api_key.inc.php' ("DB_QUOTA" with default "90\n1000"). A file 'quota_days.dat' with 2-3 lines
@@ -71,6 +71,8 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V2.21	04.11.2023 Added Network Details (2G/4G/..) 
 - V2.22 05.11.2023 Max. upload limit depending on Network, set defines(MAXM_xx) in 'api_key.inc.php!
 - V2.23 25.11.2023 If DAPIKEY_SERVER defined: indivdual external D_API_KEY check for each NEW device  (only once)
+- V2.31 13.05.2024 Drivers for SWARM (product shut down) and ASTROCAST removed
+- V2.32 24.05.2024 Added drivers form ORBCOMM IGWS2 (INMARSAT)
 
 
 
