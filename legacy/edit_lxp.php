@@ -42,6 +42,7 @@ $p100_beschr = array(
 	"MinTemp_oC[-40..10]",
 	"Config0_U31 (B0:OffPer.Inet:On/Off B1,2:BLE:On/Mo/Li/MoLi B3:EnDS B4:CE:Off/On B5:Live:Off/On)",
 	"Configuration_Command[$79]",
+	"Internet_Starttime[Timestamp.32]"
 );
 
 $pkan_beschr = array(
@@ -81,7 +82,7 @@ $p200_beschr = array(	// sys_param.lxp
 	"Bat. Volts 100%[float]",
 	"Max Ringsize (Bytes)[1000..2e31]",
 	"mAmsec/Measure[0..1e9]",
-	"Mobile Protocol[0..255] B0:0/1:HTTP/HTTPS B1:PRESET B2,3:TCP/UDPSetup"
+	"Mobile Protocol[0..255] B0:0/1:HTTP/HTTPS B1:PUSH B2,3:TCP/UDPSetup",
 );
 
 
@@ -129,10 +130,17 @@ if (!strcasecmp($ext, ".php")) {
 		} else $rel++;
 		if (@$pval == 100 && $rel == 4) $var = time();
 		echo "[$i (+$rel)] &nbsp;<input type=\"text\" name=\"z$i\" value=\"$var\"";
-		if (isset($beschr[$rel])) {
-			if (@$beschr[$rel][0] == '*') echo " readonly"; // disabled: NOT incl. with form!
+		$hbesch = @$beschr[$rel];
+		if (isset($hbesch)) {
+			if (@$hbesch[0] == '*') echo " readonly"; // disabled: NOT incl. with form!
 			echo '>';
-			echo " '", @$beschr[$rel] . "'";
+			if (strpos($hbesch,"Timestamp.32")){ // decode time
+				$secs=intval($var);
+				if($secs>1000000000){
+					echo " ='",gmdate("d.m.y H:i:s", $secs)," UTC' ";
+				}
+			}
+			echo " '", $hbesch . "'";
 		} else echo '>';
 		echo "<br>\n";
 	}
