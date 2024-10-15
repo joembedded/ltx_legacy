@@ -1,7 +1,7 @@
 <?PHP
 // -------------------------------------------------------------------
 // con_view.php - Connection Viewer (filtered)
-// 20.07.2024
+// 15.10.2024
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -53,7 +53,7 @@ if (strcasecmp($ext, ".txt")) {
 	foreach($cpcache as $cell=>$ccnt){
 		$ccom=explode(":",$cell);
 		$mcc=$ccom[0];
-		$mnc=$ccom[1];
+		$net=$ccom[1];
 		$lac=$ccom[2];
 		$cid=$ccom[3];
 		$act=$ccom[4];
