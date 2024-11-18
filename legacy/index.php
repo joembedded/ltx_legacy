@@ -89,7 +89,7 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 	$anz = 0;
 	foreach ($list as $file) {
 		if ($file == '.' || $file == '..') continue;
-		if (!ctype_xdigit($file)) continue;	
+		if (!ctype_xdigit($file)) continue;
 		if (!is_dir("./$dir/$file")) continue;	// Should not be, but..
 		if (!$dev && !@file_exists(S_DATA . "/$file/demo.cmd")) continue;
 
@@ -104,25 +104,25 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 				$devi[$tmp[0]] = $tmp[1];
 				// echo "Line: $line<br>";
 			}
+			$bakg = "";
 			if (!empty($devi['now'])) {
 				$dt = $now - $devi['now'];
 				$fage = secs2period($dt);
-			}
-			$bakg = "";
-			if ($dt > 259200) { // 14d
-				$bakg = "magenta";
-			} else if ($dt > 259200) { // 3d
-				$bakg = "red";
-			} else if ($dt > 14400) { // 24h
-				$bakg = "deeppink";
-			} else if ($dt > 43200) { // 12h
-				$bakg = "lightpink";
-			} else if ($dt > 14400) { // 4h
-				$bakg = "yellow";
-			} else if ($dt > 7200) {	// 2h
-				$bakg = "lightyellow";
-			} else if ($dt < 120) {	// 2 min
-				$bakg = "lawngreen";
+				if ($dt > 259200) { // 14d
+					$bakg = "magenta";
+				} else if ($dt > 259200) { // 3d
+					$bakg = "red";
+				} else if ($dt > 14400) { // 24h
+					$bakg = "deeppink";
+				} else if ($dt > 43200) { // 12h
+					$bakg = "lightpink";
+				} else if ($dt > 14400) { // 4h
+					$bakg = "yellow";
+				} else if ($dt > 7200) {	// 2h
+					$bakg = "lightyellow";
+				} else if ($dt < 120) {	// 2 min
+					$bakg = "lawngreen";
+				}
 			}
 
 			if ($bakg) $fage = "<span style='background-color:$bakg'> $fage </span>";
@@ -142,11 +142,11 @@ echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";
 		else echo '(<i>not set</i>)';
 		echo ")";
 
-		$sig=@$devi['signal'];
-		if($sig){
-			$mccs = substr($sig,4,3);
-			$country=@$mcca[intval($mccs)];
-			if(!$country) $country=$mcca[intval($mccs[0])]; // Fallback
+		$sig = @$devi['signal'];
+		if ($sig) {
+			$mccs = substr($sig, 4, 3);
+			$country = @$mcca[intval($mccs)];
+			if (!$country) $country = $mcca[intval($mccs[0])]; // Fallback
 			echo " &nbsp; (<i>$country</i>) &nbsp; ";
 		}
 		echo " Last Contact: $fage";

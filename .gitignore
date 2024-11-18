@@ -1,3 +1,4 @@
 geheimnix/
 data_secret/
 *.log
+.vscode
