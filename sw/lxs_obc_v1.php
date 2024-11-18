@@ -158,8 +158,8 @@ function add_data($mac, $cont)
 		@unlink(S_DATA . "/$mac/files/data.edt.bak");
 		@rename(S_DATA . "/$mac/files/data.edt", S_DATA . "/$mac/files/data.edt.bak");
 		$xlog .= " ('data.edt' -> '/data.edt.bak')";
-		$dunits = @$devi['units'];
-		if (isset($dunits)) array_unshift($cont, $dunits . "\n");
+		//$dunits = @$devi['units'];
+		//if (isset($dunits)) array_unshift($cont, $dunits . "\n");
 	}
 	@file_put_contents(S_DATA . "/$mac/files/data.edt", $cont, FILE_APPEND);
 }

@@ -1,6 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 06.09.2024 - V1.42 joembedded@gmail.com  - JoEmbedded.de
+// (C) 21.10.2024 - V1.43 joembedded@gmail.com  - JoEmbedded.de
 // Evtl. "schnelle Hilfe": error_reporting (E_ALL & ~E_DEPRECATED);
 
 error_reporting(E_ALL);
@@ -129,6 +129,7 @@ $extratxt = "";	// Added ASCII (Quectel-Cache-Prob)
 
 $idx = 0;		// Index in data
 $ecmd = "";	// echo-command
+$conid = '?';
 // $etext = "OK"; // later
 
 // load infos about this device
@@ -809,5 +810,5 @@ $xlog .= "(Run:$mtrun msec)"; // Script Runtime
 add_logfile(); // Regular exit, entry in logfile should be first
 
 if (!$expmore) {	// Finished! Start async trigger
-	trigger($devi['reason'], isset($vpnf));	// If trigger fails: New entry in logfile
+	trigger(@$devi['reason'], isset($vpnf));	// If trigger fails: New entry in logfile
 }
