@@ -1,22 +1,25 @@
 <?php
-/* lxu_wug_v1.php - Script fuer Wunderground-Get-Daten
-* 18.11.2024  - (C)JoEmbedded.de
+/* lxu_wug_v1.php - Script fuer Wunderground-aehnliche Daten per GET-URL
+* 19.11.2024 (C)JoEmbedded.de
+*
+* Docu (DE/EN): https://joembedded.de/x3/ltx_firmware/index.php?dir=./Open-SDI12-Blue-Sensors/0950_GetUpload
 *
 * ------------------------------------------------------
-* Die Daten werden via GET geschickt. Z.B. fuer Ecowitt-Stationen, z.B.
-* localhost/ltx/sw/lxu_wug_v1.php?ID=0011223344556677&PASSWORD=XXXXX&&tempf=61.70
+* Beispiel:
+* server.abc/ltx/sw/lxu_wug_v1.php?ID=0011223344556677&PASSWORD=XXXXX&&tempf=61.70
 *
 * Setup fuer EcoWitt in EcoWitt-APP:
 * - Wetterdienst auswaehlen
-* - Protokoll Wunderground
+* - Protokoll: Wunderground
 * - Server/IP(http:) Hostname, z.B. 'server.abc' oder IP
 * - Pfad: inkl. '/'und'?', z.B.: '/ltx/sw/lxu_wug_v1.php?'
 * - ID: eine (beliebige) 16-stellige HEX-Zahl (z.B '0123456789ABCDEF')
 * - Key: 'D_API_KEY' (aus Datei './conf/api_key.inc.php', 
-*         kann auch dynamisch pro Geraet sein, siehe './conf/check_dapikey.inc.php'
-* - Port: i.d.R: 80 
-* ------------------------------------------------------
-*/
+*         kann auch dynamisch pro Geraet sein, siehe './conf/check_dapikey.inc.php'
+* - Port: i.d.R: 80
+* - Upload-Intervall: z.B. 1 Minute
+* ------------------------------------------------------*/
+
 
 error_reporting(E_ALL);
 ini_set("display_errors", true);
