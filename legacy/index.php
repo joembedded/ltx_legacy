@@ -23,8 +23,8 @@ if (!strcmp($api_key, L_KEY)) {
 }
 echo "<!DOCTYPE HTML><html><head>";
 
-if ($dev) $title = "LegacyLTX Develop-Login V0.55";
-else $title = "LegacyLTX Home and Guest/Demo-Login V0.55";
+if ($dev) $title = "LegacyLTX Develop-Login V0.56";
+else $title = "LegacyLTX Home and Guest/Demo-Login V0.56";
 
 $self = $_SERVER['PHP_SELF']; // Periodisch alle 30 Sekunden  auffrischen
 echo "<meta http-equiv=\"refresh\" content=\"30; URL=$self\">";

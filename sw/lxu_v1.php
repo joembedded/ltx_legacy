@@ -1,6 +1,6 @@
 <?php
 // lxu_v1.php Server-Communication Script for LTrax. Details: see docu
-// (C) 21.10.2024 - V1.43 joembedded@gmail.com  - JoEmbedded.de
+// (C) 05.12.2024 - V1.44 joembedded@gmail.com  - JoEmbedded.de
 // Evtl. "schnelle Hilfe": error_reporting (E_ALL & ~E_DEPRECATED);
 
 error_reporting(E_ALL);
@@ -106,6 +106,7 @@ if ($dapikey === false || strcmp($api_key, $dapikey)) { //
 	include("conf/check_dapikey.inc.php"); // only on demand: check extern, opt. set daksave
 	if ($dapikey === false || strcmp($api_key, $dapikey)) exit_error("API Key");
 }
+
 if (empty($fname)) exit_error("No Data");
 if (check_dirs()) exit_error("Error (Directory/MAC not found)");
 if (isset($daksave)) file_put_contents("$dpath/dapikey.dat", $dapikey); // Update Key
@@ -298,20 +299,34 @@ for (;;) {
 					if ($dbg) fwrite($of, "- Already uploaded to Pos. $la, $ln Bytes new\n");
 				}
 				// Decide how much to uploade, $act is known at this stage
-
 				if ($le > $la) {	// New Data?
 					if (@$act == 5) $maxmem = MAXM_NB;
 					else $maxmem = MAXM_2GM;
+					$instget=true;
+
 					if ($le - $la > $maxmem) {
-						$la = $le - $maxmem;
-						$xlog .= "(WARNING: File:'$fname' Sizelimit $maxmem )";
+						if(defined('MXGET_MEM')){	// z.B. ASPION: Fehlende Files ggs. in mehreren Blocks, als get-cmd
+							$mxget_mem = MXGET_MEM;
+							if($le - $la > $mxget_mem){
+								$la = $le - $mxget_mem;
+							}
+							$tget_mem=$le - $la;
+							$xlog .= "(WARNING: File:'$fname' Sizelimit $tget_mem (Blocksize $maxmem)";
+							file_put_contents("$dpath/get/$fname","a\n$la\n$tget_mem\n$maxmem\n"); // Only 1 Try(a), Start, Tlen, Blklen
+							$instget=false;
+						}else{	// regulaer max. 1 Bloxk und direkt
+							$la = $le - $maxmem;
+							$xlog .= "(WARNING: File:'$fname' Sizelimit $maxmem )";
+						}
 					}
-					// Get the file or parts
-					// POS0.4 ANZ.4 FLEN.1 NAME.FLEN
-					$payload = str_u32($la) . str_u32($le - $la) . chr(strlen($fname)) . $fname;
-					$tecmd = "\xC0" . str_u32(strlen($payload)) . $payload; // Blocklen is 5+datalen+4_crclen $C0: CFILESEND
-					$ecmd .= $tecmd . str_u32((~crc32($tecmd)) & 0xFFFFFFFF); // Append CRC
-					$expmore = 1;	// If set: expect more!
+					if($instget){
+						// Get the file or parts
+						// POS0.4 ANZ.4 FLEN.1 NAME.FLEN
+						$payload = str_u32($la) . str_u32($le - $la) . chr(strlen($fname)) . $fname;
+						$tecmd = "\xC0" . str_u32(strlen($payload)) . $payload; // Blocklen is 5+datalen+4_crclen $C0: CFILESEND
+						$ecmd .= $tecmd . str_u32((~crc32($tecmd)) & 0xFFFFFFFF); // Append CRC
+						$expmore = 1;	// If set: expect more!
+					}
 				} else {
 					if ($dbg) fwrite($of, "- File OK\n"); // Nothing to do..
 				}
@@ -326,9 +341,12 @@ for (;;) {
 			$fflags = ord($data[$bp0 + 8]);
 			$fnlen = ord($data[$bp0 + 9]);
 			$fname = substr($data, $bp0 + 10, $fnlen);	// extract name
+
 			if (!strcasecmp(substr($fname, strrpos($fname, '.')), ".php")) $fname .= '_'; // 
 
 			$flen = $len - $fnlen - 10; // Only len of this block!
+
+			$newdata = substr($data, $bp0 + 10 + $fnlen, $flen);
 			if ($dbg) fwrite($of, "A4: FILE $fname Pos0:$fpos0, Len:$flen, Date:$fdate, F:$fflags (uploaded)\n");
 
 			// Read existing Meta infos in array
@@ -341,7 +359,8 @@ for (;;) {
 				}
 			} // No data for new files
 			$wmode = 1;	// Assume new file (mode 'wb')
-			if (!file_exists("$dpath/get/$fname")) { // for Automatic files Add data
+			$getsta = @file("$dpath/get/$fname", FILE_IGNORE_NEW_LINES); // telomeric requesting, read as string or array[4]
+			if ($getsta === false) { // for Automatic files Add data
 				// Check if we got, what we ordered (only for Auty-Sync-Files)
 				if (!empty($fostat['date']) && $fostat['date'] == $fdate && $fostat['len'] > 0) {
 					// date is equal and file exists and contains already data
@@ -366,6 +385,22 @@ for (;;) {
 						$xlog .= "(WARNING: '$fname': GAP:$fpos0 Bytes at Start of File)";
 					}
 				}
+			} else { // Explizit per get angefordete Files ($getsta=array[4])
+				if (count($getsta) > 2) {
+					$gpos0 = intval(@$getsta[1]);
+					$gpmaxlen = intval(@$getsta[2]);
+
+					if ($fpos0>0 && $fpos0 === $gpos0) $wmode = 0;	// Append
+					$gpos0 = $fpos0 + $flen;
+					$gpmaxlen -= $flen;
+					if ($gpmaxlen > 0 && strlen($getsta[0])<10) { // Es ist noch was zu holen
+						$getsta[0] .= 'x'; // Versuch war erfolgreich
+						$getsta[1] = $gpos0;
+						$getsta[2] = $gpmaxlen; //[3]: blocklen
+						file_put_contents("$dpath/get/$fname", implode("\n", $getsta));
+						$getsta = false;	// Don't delete
+					}
+				}
 			}
 
 			if ($wmode) {	 // Write NEW
@@ -377,12 +412,11 @@ for (;;) {
 			} else {	// Append to existing file
 				$of2 = fopen("$dpath/files/$fname", 'ab'); // Else append
 			}
-			$newdata = substr($data, $bp0 + 10 + $fnlen, $flen);
 			fputs($of2, $newdata);
 			fclose($of2);
 
 			// If this upload was requested: Clear request-file
-			@unlink("$dpath/get/$fname");
+			if ($getsta !== false) unlink("$dpath/get/$fname");
 
 			// Store new infos about this file in Meta
 			$fostat['flags'] = $fflags;
@@ -397,11 +431,17 @@ for (;;) {
 
 			// Store also the fragment in in_new
 			// Temp_filename is preceeded by filedate plus offset
-			$ftemp = gmdate("Ymd_His", $fdate) . "_$fpos0" . '_';
+			// Alt(mit 'wb'): $ftemp = gmdate("Ymd_His", $fdate) . "_$fpos0" . '_';
+			$ftemp = $ftemp = gmdate("Ymd_His_", $devi['con_id']); // Neu mit 'ab'
 			$nsfname = $ftemp . $fname;
-			$of2 = fopen("$dpath/in_new/$nsfname", 'wb'); // Delta as single file
+			$of2 = fopen("$dpath/in_new/$nsfname", 'ab' /*'wb'*/); // Delta as single file
 			fputs($of2, $newdata);
 			fclose($of2);
+			if($dbg){	
+				$of2 = fopen("$dpath/dbg/cfiledata_$nsfname", 'ab' /*'wb'*/); 
+				fputs($of2, $newdata);
+				fclose($of2);
+			}					
 			break;
 
 		case 0xA5: 	// CSIGNAL_SG3G - Cell IDs
@@ -516,10 +556,8 @@ if ($send_cmd <= 0 && file_exists("$dpath/cmd/_firmware.sec.umeta")) { // Check 
 		}
 	}
 }
-
 // else(No Firmware transfer required): Check other commands (with send_cmd: nothing extra)!
 if ($send_cmd <= 0) {
-	// todo: --- correct access to commands!
 	// --- Problems: examples: - getdir followed by del in one stage will fail, because notepad() on device is filled first
 	//   - get and put in one stage might fail, because meta-infos might be incomplete ...
 	if (file_exists("$dpath/cmd/getdir.cmd")) { // Dir highes priority as command, sets expmore
@@ -546,33 +584,55 @@ if ($send_cmd <= 0) {
 		foreach ($getlist as $getfn) {
 			if (!strcmp($getfn, '.') || !strcmp($getfn, '..')) continue;
 			// File found, get META-Data
-			$fgeta = array();
-			$getstr = file_get_contents("$dpath/get/$getfn"); // telomeric requesting
-			$gslen = strlen($getstr);
-			if ($gslen > 4) $gslen = 4;	// Limit to 4 tries
+			// Entweder nur 1 Zeile mit Telos oder 3/4 Zeilen: Telos,Pos0,Len, Optional:Blocksize
+			$getsta = @file("$dpath/get/$getfn", FILE_IGNORE_NEW_LINES); // telomeric requesting, read as array
+			$gslen = strlen(@$getsta[0]);
+			if ($gslen > 10) $gslen = 10;	// Limit to 10 tries
 			else if ($gslen == 0) { // Game over
 				unlink("$dpath/get/$getfn");
-				$xlog .= "(WARNING: File '$getfn' not found (get))";
+				$xlog .= "(ERROR: File '$getfn' get failed)";
 				continue;
 			}
-			$of = fopen("$dpath/get/$getfn", 'wb');
-			fwrite($of, substr($getstr, 0, $gslen - 1));
-			fclose($of);
+			$getsta[0] = substr($getsta[0], 0, $gslen - 1); // Telomeric writeback
+			file_put_contents("$dpath/get/$getfn", implode("\n", $getsta));
 
 			$lines = @file("$dpath/cmd/$getfn.vmeta", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 			if ($lines != false) {
+				$fgeta = array();
 				foreach ($lines as $line) {
 					$tmp = explode("\t", $line);
 					$fgeta[$tmp[0]] = $tmp[1];
 				}
-				$xlog .= "(get($gslen): '$getfn')";
+				// Vorgaben evtl. und Maximalwerte
+				$vdglen = $fgeta['vd_len'];
+				$vd0 = 0;
+				if (count($getsta) > 2) {
+					$gpos0 = intval(@$getsta[1]);
+					$gpmaxlen = intval(@$getsta[2]);
+					$maxblock = intval(@$getsta[3]); // Optional if >0
+					$xlog .= "(GET '$getfn' Pos0:$gpos0, $gpmaxlen Bytes)";
+					if ($gpos0 < 0 || ($gpos0+$gpmaxlen) > $vdglen || $gpmaxlen < 1) {
+						$xlog .= "(ERROR: get:'$getfn' Pos/Len:$gpos0/$gpmaxlen)";
+						$vd0 = -1;
+					} else {
+						$vd0 = $gpos0;
+						$ovdmax = $vdglen - $gpos0;
+						if ($maxblock > 0 && $ovdmax > $maxblock) 	$ovdmax = $maxblock;
+						$vdglen = $gpmaxlen;
+						if ($vdglen > $ovdmax) {
+							$vdglen = $ovdmax;
+							$xlog .= "(Limit Len to $vdglen Bytes)";
+						}
+					}
+				}
 				// Get the file or parts
 				// POS0.4 ANZ.4 FLEN.1 NAME.FLEN
-				$payload = str_u32(0) . str_u32($fgeta['vd_len']) . chr(strlen($getfn)) . $getfn;
-				$tecmd = "\xC0" . str_u32(strlen($payload)) . $payload; // Blocklen is 5+datalen+4_crclen $C0: CFILESEND
-				$ecmd .= $tecmd . str_u32((~crc32($tecmd)) & 0xFFFFFFFF); // Append CRC
-				$expmore = 1;	// If set: expect more!
-
+				if($vd0>=0){
+					$payload = str_u32($vd0) . str_u32($vdglen) . chr(strlen($getfn)) . $getfn;
+					$tecmd = "\xC0" . str_u32(strlen($payload)) . $payload; // Blocklen is 5+datalen+4_crclen $C0: CFILESEND
+					$ecmd .= $tecmd . str_u32((~crc32($tecmd)) & 0xFFFFFFFF); // Append CRC
+					$expmore = 1;	// If set: expect more!
+				}else unlink("$dpath/get/$getfn"); 
 			} else {
 				$xlog .= "(ERROR: get: '$getfn' no metadata)"; // possibly deleted file
 				unlink("$dpath/get/$getfn");	// Ignored
@@ -650,7 +710,7 @@ if ($send_cmd <= 0) {
 				$fputa['sent']++;	// Save Sent No.
 
 				if ($fputa['sent'] > 1) {
-					// Sende-Stage und Time merkene und nur wenn stage+1 = OK entfernen
+					// Sende-Stage und Time merken und nur wenn stage+1 = OK entfernen
 					if (($fputa['now'] == $devi['con_id']) && ($fputa['stage'] + 1 == $stage)) {
 						$xlog .= "(Put File '$putfn' confirmed)";
 						// Copy File to files
@@ -779,8 +839,8 @@ if ($send_cmd >= 0) { // preset to -1
 }
 
 $ecmd .= $extratxt;
-if ($expmore) $ecmd .= "\xFE:More"; 
-else $ecmd .= "\xFF:Done"; 
+if ($expmore) $ecmd .= "\xFE:More";
+else $ecmd .= "\xFF:Done";
 $elen = strlen($ecmd);
 
 $xlog .= "($elen Bytes Reply)";
