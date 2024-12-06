@@ -360,7 +360,7 @@ for (;;) {
 			} // No data for new files
 			$wmode = 1;	// Assume new file (mode 'wb')
 			$getsta = @file("$dpath/get/$fname", FILE_IGNORE_NEW_LINES); // telomeric requesting, read as string or array[4]
-			if ($getsta === false) { // for Automatic files Add data
+			if ($getsta === false || $stage === 0) { // for Automatic files Add data
 				// Check if we got, what we ordered (only for Auty-Sync-Files)
 				if (!empty($fostat['date']) && $fostat['date'] == $fdate && $fostat['len'] > 0) {
 					// date is equal and file exists and contains already data
@@ -389,7 +389,6 @@ for (;;) {
 				if (count($getsta) > 2) {
 					$gpos0 = intval(@$getsta[1]);
 					$gpmaxlen = intval(@$getsta[2]);
-
 					if ($fpos0>0 && $fpos0 === $gpos0) $wmode = 0;	// Append
 					$gpos0 = $fpos0 + $flen;
 					$gpmaxlen -= $flen;
