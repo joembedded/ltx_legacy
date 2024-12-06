@@ -115,7 +115,9 @@ $reason = @$devi['reason'];
 if (isset($reason)) {
 	echo " - Reason: ";
 	switch ($reason & 15) { //
-			//case 1:	echo "RADIO"; break;
+		case 1:
+			echo "(intern)";
+			break;
 		case 2:
 			echo "AUTO";
 			break;
@@ -375,17 +377,17 @@ foreach ($flist as  $fmeta) {
 
 	if (!empty($ffstat['date'])) {
 		echo " (Local: ";
-		if ($ffstat['pos0']) echo " (Pos0:" . $ffstat['pos0'] . ', Local:' . ($ffstat['len'] - $ffstat['pos0']) . 'Bytes)';
+		if ($ffstat['pos0']) echo " (Pos0:" . $ffstat['pos0'] . ', Local:' . ($ffstat['len'] - $ffstat['pos0']) . ' Bytes)';
 		// Truncated local file + Startpos must be identical  to reported size, and datee must be equal)
 		if (($ffstat['pos0'] + $loflen) == $ffstat['len'] &&  $ffstat['len'] == $fostat['vd_len'] && $ffstat['date'] == $fostat['vd_date']) {
 			if ($ffstat['pos0']) {
 				echo " *UP-TO-DATE (But only last $loflen Bytes on Server!)*";
 			} else echo " *UP-TO-DATE*"; // complete!
 		} else {
-			echo " Len:" . $fostat['vd_len'] . " Bytes";
 			if ($ffstat['len'] != $loflen) echo " (<b>ERROR: Real-Local: $loflen Bytes!</b>)";
-			if ($ffstat['len'] != $fostat['vd_len']) echo " LENGTH";
-			if ($ffstat['date'] != $fostat['vd_date']) echo " TIMESTAMP";
+			if ($ffstat['len'] != $fostat['vd_len']) echo " LENGTH(" . $fostat['vd_len'] . " Bytes)";;
+
+			if ($ffstat['date'] != $fostat['vd_date']) echo " TIMESTAMP(" . gmdate("d.m.Y H:i:s)", $ffstat['date']);
 		}
 		echo ') ';
 	}
@@ -406,10 +408,8 @@ foreach ($flist as  $fmeta) {
 		}
 	}
 
-	if ($ffl & 64) {
-		//echo "(No GET because SYNC)";
-	} else if ($ffl & 128) {
-		//echo "(No GET because HIDDEN)";
+	if ($ffl & 128) { //echo "(No GET because HIDDEN)";
+	} else if ($ffl & 64) { //echo "(No GET because SYNC)"
 	} else {
 		if (!$demo) {
 			if (@file_exists("$dpath/get/$fname")) {
