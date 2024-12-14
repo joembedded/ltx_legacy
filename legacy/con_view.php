@@ -1,13 +1,29 @@
 <?PHP
 // -------------------------------------------------------------------
 // con_view.php - Connection Viewer (filtered)
-// 15.10.2024
+// 14.12.2024
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
 include("mcclist.inc.php");
 
 // ---------------------------- M A I N --------------
+session_start();
+if (isset($_REQUEST['k'])) {
+	$api_key = $_REQUEST['k'];
+	$_SESSION['key'] = L_KEY;
+} else $api_key = @$_SESSION['key'];
+if (!strcmp($api_key, L_KEY)) {
+	$dev = 1;	// Dev-Funktionen anzeigen
+} else {
+	$dev = 0;	// Dev-Funktionen anzeigen
+}
+if (!$dev) {
+	echo "ERROR: Access denied!";
+	exit();
+}
+
+
 
 $mac = $_GET["s"];
 $fname = $_GET["f"];

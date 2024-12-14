@@ -11,7 +11,7 @@
 	define ("L_KEY","LegacyLTX");	// legacyKey for ***LEGACY Login***
 	define ("MAXM_2GM", 20000);	// max. auto upload limit for 2G/LTE-M
 	define ("MAXM_NB", 5000);	// LTE-NB is slow
-	// define ("MXGET_MEM", 100000);	// If defined Max. Multiblock, >= MAXM_2GM!
+	define ("MXGET_MEM", 100000);	// If defined Max. Multiblock, >= MAXM_2GM!
 	// Optionally (if GPS_VIEW used):
 	define ("MAPKEY","pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw"); // Key for MAPBOX.COM Mapserver, Request an OWN one if necessary!
 
