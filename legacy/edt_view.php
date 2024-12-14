@@ -4,13 +4,29 @@
 	* EDT ("EasyDaTa") is a very flexible and easy-2-use file format to 
 	* store logged data. Read the docu!
 	*
-    * Version: V2.00 - 19.10.2023
+    * Version: V2.01 - 14.12.2024
 	* (C) JoEmbedded.de
     * ---------------------------------------------------------------------- */
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
 include("../sw/lxu_loglib.php");
+
+session_start();
+if (isset($_REQUEST['k'])) {
+	$api_key = $_REQUEST['k'];
+	$_SESSION['key'] = L_KEY;
+} else $api_key = @$_SESSION['key'];
+if (!strcmp($api_key, L_KEY)) {
+	$dev = 1;	// Dev-Funktionen anzeigen
+} else {
+	$dev = 0;	// Dev-Funktionen anzeigen
+}
+if (!$dev) {
+	echo "ERROR: Access denied!";
+	exit();
+}
+
 
 // -- $B64-Functions / Decompress -
 // Only allowed token 111 and tokens 0..89

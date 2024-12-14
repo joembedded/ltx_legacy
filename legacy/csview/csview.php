@@ -135,10 +135,13 @@ remove_old_csv();
 if (empty($mac)) error_message("MAC not set");
 
 // Remote File erzeugen lassen
+session_start();
+$skey = @$_SESSION['key'];
 $self = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
 $calls = substr($self, 0, strrpos($self, '/'));  // Muss 2 Levels hoch gehen
 $call = substr($calls, 0, strrpos($calls, '/'));
-$info = file_get_contents("$call/edt_view.php?s=$mac&f=$fname&o=2"); // Remove Blabla
+$url = "$call/edt_view.php?s=$mac&f=$fname&o=2&k=$skey";
+$info = file_get_contents($url); // Remove Blabla
 if (strlen($info) < 10) {
   echo "*ERROR: Not DATA*\n";
   exit();
