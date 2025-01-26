@@ -19,9 +19,30 @@
 	if(!isset($ln) || strlen($ln)!==2) $ln = "EN";
 	else $ln = strtoupper($ln);
 	$qrtext = "TXT-$ln:$txt";
+
+
+	$plaintxt = urldecode(@$_REQUEST['plaintxt']);
+	if(!strlen($plaintxt)) $plaintxt = "CMD: .f 30 1";
+
 ?>
 	<h1>QR Text Generator</h1>
-	Generator fuer QR Codes fuer LTX-Texte.<br><br>
+	Generator fuer QR Codes fuer LTX-Texte.<br>
+	<hr>
+	<br>
+
+	<form action="./">
+	<label for="plaintxt">Enter Plain-Text (Link, Kommando, ...):</label><br>
+	<input type="text" id="plaintxt" name="plaintxt" size = "120" value="<?php echo($plaintxt); ?>"><br>
+	<br>
+	<input type="submit" value="Submit">
+	</form> 
+	<br>
+	QR: '<?php echo($plaintxt); ?>'<br>
+	<img src="./ltx_qr.php?text=<?php echo(urlencode($plaintxt)); ?>">
+
+	<br>
+	<hr>
+	<br>
 	
 	<form action="./">
 	<label for="qrlang">Enter Language (2 Chars, e.g. 'en','de','it',..):</label><br>
@@ -31,9 +52,11 @@
 	<br>
 	<input type="submit" value="Submit">
 	</form> 
+
 	<br>
 	QR: '<?php echo($qrtext); ?>'<br>
 	<img src="./ltx_qr.php?text=<?php echo(urlencode($qrtext)); ?>">
+
 
 </body> <!-- BODY END -->
 </html>
