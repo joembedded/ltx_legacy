@@ -1,5 +1,5 @@
 <?php 
-// QR-Generator PHP - Stand 26.02.24
+// QR-Generator PHP - Stand 25.01.25
 
 // Quelle: https://www.geeksforgeeks.org/dynamically-generating-a-qr-code-using-php/
 // Include the qrlib file 
@@ -30,6 +30,8 @@
  
   //echo "Text:'$text', Ecc:'$ecc', PixelSize:$pixel_Size, FrameSize:$frame_Size\n"; exit(); // DBG
  
+  header('Access-Control-Allow-Origin: *');
+
   // Generates QR Code and NOT Stores it
   QRcode::png( $text , false , $ecc , $pixel_Size , $frame_Size ); 
 ?>
