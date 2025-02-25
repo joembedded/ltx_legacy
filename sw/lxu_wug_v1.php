@@ -15,7 +15,7 @@
 * - Pfad: inkl. '/'und'?', z.B.: '/ltx/sw/lxu_wug_v1.php?'
 * - ID: eine (beliebige) 16-stellige HEX-Zahl (z.B '0123456789ABCDEF')
 * - Key: 'D_API_KEY' (aus Datei './conf/api_key.inc.php', 
-*         kann auch dynamisch pro Geraet sein, siehe './conf/check_dapikey.inc.php'
+* - kann auch dynamisch pro Geraet sein, siehe './conf/check_dapikey.inc.php'
 * - Port: i.d.R: 80
 * - Upload-Intervall: z.B. 1 Minute
 * ------------------------------------------------------*/

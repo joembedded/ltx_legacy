@@ -35,7 +35,7 @@
 		<li>'MAC:mac OT:ot' - MAC/Ownertoken for BlxDasboard - Example 'MAC:0011223344556677 OT:0122345789ABCDEF'</li>
 		<li>'MAC:mac PIN:ot' - MAC/PIN for BlxDasboard - Example 'MAC:0011223344556677 PIN:123456'</li>
 		<li>'http(s)://link' - Simple link</li>
-		<li>'WIFI:S:ssid;T:wpa;P:password;;' - Wifi, ssid:Nabe of Network, wpa:Encr., use WPA, p:Passowrt - Example 'WIFI:S:MyHome;T:WPA;P:SecRet;;'</li>
+		<li>'WIFI:S:ssid;T:wpa;P:password;' - Wifi, ssid:Name of Network, wpa:Encr., use WPA, p:Password - Example 'WIFI:S:MyHome;T:WPA;P:SecRet;'</li>
 		<li>'geo:lat,lng - GeoLocation (with optional Search-data) - Example 'geo:49.010,8.404?q=Karlsruhe'</li>
 	</ul>
 	<br>
