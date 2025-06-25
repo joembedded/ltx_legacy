@@ -73,6 +73,6 @@ _(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Ke
 - V2.23 25.11.2023 If DAPIKEY_SERVER defined: indivdual external D_API_KEY check for each NEW device  (only once)
 - V2.31 13.05.2024 Drivers for SWARM (product shut down) and ASTROCAST removed
 - V2.32 24.05.2024 Added drivers form ORBCOMM IGWS2 (INMARSAT)
-
+- V2.53 25.06.2025 Added LoRaWAN support for ChirpStack V4 and TTN V3 ('lxu_ltxlora_v1.php')
 
 
