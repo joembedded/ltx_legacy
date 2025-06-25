@@ -16,8 +16,7 @@ include '../php_qr/qrlib.php'; // selbiges Verzeichnis
 // Test: http://localhost/ltx/sw/php_qr/ltx_qr.php?text=Hallo%20Welt&ecc=M
 // Test: https://joembedded.de/ltx/sw/php_qr/ltx_qr.php?text=Hallo%20Welt&ecc=M
 
-//error_reporting(E_ALL); - Weglassen, sonst lange error-Datei!
-define("VERSION", "V1.00 / 03.02.2025");
+error_reporting(E_ALL);
 
 // Parameters:
 $text = $_REQUEST['text'] ?? '(NoText)';
