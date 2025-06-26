@@ -24,7 +24,7 @@
  *   server.abc/ltx/sw/lxu_ltxlora_v1.php?KEY=xxxx
  *   (Data as JSON in the HTTP body)
  *
- * V1.01 - 25.06.2025 (C) JoEmbedded.de
+ * V1.02 - 26.06.2025 (C) JoEmbedded.de
  */
 
 error_reporting(E_ALL);
@@ -155,8 +155,14 @@ try {
 	if (check_dirs()) exit_json_error("Error (Directory/MAC not found)");
 	if (isset($daksave)) file_put_contents("$dpath/dapikey.dat", $dapikey); // Update key
 
-	// For debug: record complete payload (WARNING: A lot of data!)
-	if ($dbg) file_put_contents("$dpath/dbg/indata.log", $now_str . ":\n" . $payload . "\n\n", FILE_APPEND);
+	// For debug: blackbox-payloads
+	if ($dbg) {
+		if (@filesize("$dpath/dbg/indata.log") > 100000) {	// Main LOG
+			@unlink("$dpath/dbg/indata.log/_indata_old.log");
+			rename("$dpath/dbg/indata.log", "$dpath/dbg/indata.log/_indata_old.log");
+		}
+		file_put_contents("$dpath/dbg/indata.log", $now_str . ":\n" . $payload . "\n\n", FILE_APPEND);
+	}
 
 	// Isolate important variables
 	$timestr = $data['time'] ?? $data['received_at'] ?? '';
