@@ -180,7 +180,7 @@ try {
 		foreach ($rxInfo as $rxs) {
 			if ($rxs['rssi'] > $rssi) {
 				$rssi = $rxs['rssi'];
-				$snr = $rxs['snr'];
+				$snr = $rxs['snr'] ?? '(?)'; // Missing SNR sometimes happen
 			}
 		}
 		if ($fcnt < 0 || $rssi == -199 || $snr == -199) $paylog = true;
