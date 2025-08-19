@@ -1,7 +1,7 @@
 <?PHP
 // -------------------------------------------------------------------
 // con_view.php - Connection Viewer (filtered)
-// 14.12.2024
+// 02.08.2025
 
 error_reporting(E_ALL);
 include("../sw/conf/api_key.inc.php");
@@ -73,7 +73,7 @@ if (strcasecmp($ext, ".txt")) {
 		$lac=$ccom[2];
 		$cid=$ccom[3];
 		$act=$ccom[4];
-		$acts = array("No/unkn.", "2G", "_GPRS", "_EDGE", "LTE_M", "LTE_NB", "_LTE");
+		$acts = array("No/unkn.", "2G", "_GPRS", "_EDGE", "LTE_M", "LTE_NB", "LTE");
 		$actn=@$acts[$act];
 
 		$country=@$mcca[$mcc];
@@ -114,7 +114,7 @@ if (strcasecmp($ext, ".txt")) {
 
 			if($dbm!=0) echo "dbm:$dbm ";
 			if($act){
-				$acts = array("No/unkn.", "2G", "_GPRS", "_EDGE", "LTE_M", "LTE_NB", "_LTE");
+				$acts = array("No/unkn.", "2G", "_GPRS", "_EDGE", "LTE_M", "LTE_NB", "LTE");
 				$actn=@$acts[$act];
 				echo "($actn) ";
 			}

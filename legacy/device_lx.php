@@ -8,7 +8,7 @@ session_start();
 if (isset($_REQUEST['k'])) {
 	$api_key = $_REQUEST['k'];
 	$_SESSION['key'] = L_KEY;
-} else $api_key = @$_SESSION['key'];
+} else $api_key = @$_SESSION['key'] ?? '';
 if (!strcmp($api_key, L_KEY)) {
 	$demo = 0;	// Dev-Funktionen anzeigen
 } else {
@@ -26,7 +26,7 @@ echo "<meta http-equiv=\"refresh\" content=\"15; URL=$self?$qs\"></head>";
 <?php
 // Legacy - device_lx.php Device View Script for LTX. Details: see docu
 // (C)joembedded@gmail.com  - jomebedded.de
-// Version: 0.55 25.11.2023
+// Version: 0.56 14.07.2025
 
 // todo: Kann sein, dass bei put/get/dir/del/-remove n File vergessen worden ist: pruefen!
 // todo: maybe LOCK makes sense for several files
@@ -592,7 +592,8 @@ if (!$demo) {
 	if (@file_exists(S_DATA . "/$mac/cmd/dbg.cmd")) {
 		echo "<br><b>***Debug enabled:***</b><br>";
 		echo "<a href=\"unlink_lx.php?s=$mac&f=cmd/dbg.cmd\">[Disable DEBUG]</a><br>";
-		// Only via Dev.php! echo "<a href=\"browse.php?dir=$dpath\">Browse Device Files ('$mac')</a><br>";
+		// Only via Dev.php! 
+		echo "<a href=\"browse.php?dir=$dpath\">Browse Device Files ('$mac')</a><br>";
 	} else {
 		echo "<br>(Debug disabled) ";
 		echo "<a href=\"setcmd_lx.php?s=$mac&f=cmd/dbg.cmd\">[Enable DEBUG]</a><br>";
