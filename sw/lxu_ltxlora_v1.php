@@ -28,7 +28,7 @@
  *   (Data as JSON in the HTTP body)
  * For Tests server.abc/ltx/sw/lxu_ltxlora_v1.php?KEY=xxxx&test=fname
  *
- * V1.08 - 22.07.2025 (C) JoEmbedded.de
+ * V1.09 - 12.11.2025 (C) JoEmbedded.de
  */
 
 error_reporting(E_ALL);
@@ -333,7 +333,11 @@ try {
 		$line .= " 100:$rpack 102:$rssi 103:$snr";
 		$units .= " 100:relNo 102:RSSI(dBm) 103:SNR(dB) 104:Delta(sec)";
 		$outpak = @$devi['ts_pack'];
-		if (isset($outpak)) $line .= " 104:" . $unix_ts - $outpak;
+		if (isset($outpak)) {
+			$travsecs = $unix_ts - $outpak;
+			if($travsecs>99999) $travsecs=99999;
+			$line .= " 104:" . $travsecs;
+		}
 		$devi['ts_pack'] = $unix_ts;
 		$edtdata = array($line . "\n");
 
@@ -394,7 +398,7 @@ try {
 	if ($paytrigger) {
 		$rr = rand(100000, 999999); // Possible: several files per second!
 		$ftemp = gmdate("Ymd_His", $now) . "_lora$rr.edt'"; // No file pos
-		if ($dbg) $xlog .= "($ftmp)";
+		if ($dbg) $xlog .= "($ftemp)";
 		file_put_contents("$dpath/in_new/" . $ftemp, $edtdata);
 		add_data($edtdata);
 	} else { // e.g. MIC commands or battery level or ..
