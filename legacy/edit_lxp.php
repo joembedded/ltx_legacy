@@ -42,7 +42,7 @@ $p100_beschr = array(
 	"MinTemp_oC[-40..10]",
 	"Config0_U31 (B0:OffPer.Inet:On/Off B1,2:BLE:On/Mo/Li/MoLi B3:EnDS B4:CE:Off/On B5:Live:Off/On)",
 	"Configuration_Command[$79]",
-	"Internet_Starttime[Timestamp.32]"
+	"Internet_Offset[0..86399]"
 );
 
 $pkan_beschr = array(
