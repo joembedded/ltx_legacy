@@ -1,78 +1,87 @@
-# LTX Microcloud **LEGACY** #
-**LEGACY ('TextOnly') Version**
+# LTX Microcloud Legacy
 
-__This is a reduced version of LTX Server, only using PHP and the Server's Filesystem to communicate with LTX LTraX Loggers__
+**LEGACY ("TextOnly") version**
 
-LTX can be installed WITH (named as "LTX_Server") Database and WITHOUT (named as "LTX_Legacy").
+This is a reduced version of LTX Server. It uses only PHP and the server's filesystem to communicate with LTX LTraX loggers.
 
-In case of "LTX_Legacy" all data will be sent to directories and ALL device's new data will
-be added to a file '.../out_total/total.edt' for the device. This file is simple text ('EDT'-Format) 
-and might become quite large over time ;-)
-Note: using "CS_VIEW.PHP' for graphs requires PHP's gdlib extension enabled.
+LTX can be installed in two modes:
 
-Some very simple scripts allow rudimentary access to all devices/loggers functions (as well as secure FOTA Updates and generating device Labels)
+- **LTX_Server**: with database support.
+- **LTX_Legacy**: without database support.
 
-The input script '../sw/ltu_trigger.php' will add the data (feel free to modify it for your own requirements)
+In **LTX_Legacy** mode, all data is written to directories. Each device's new data is appended to `.../out_total/total.edt`. This file is plain text in `EDT` format and can become quite large over time.
 
-## Important: This repository ('LTX_Legacy') is automatically generated/maintained by scripts! No Feedback to Issues/Request/Comments ##
+Note: using `CS_VIEW.PHP` for graphs requires PHP's `gdlib` extension to be enabled.
 
-***Installation:*** 
+Some very simple scripts allow rudimentary access to all device/logger functions, including secure FOTA updates and device label generation.
 
- 1. Simply copy all to your server, Server must run HTTP (by default port 80). It is a good idea to make the Server reachable by HTTP and HTTPS with the same name (see 5.).
- (Data transfer via HTTP for (devices/loggers) takes much less energy than HTTPS (optionally on request devices can also use HTTPS), hence we recommend HTTP for communication Server<->Loggers, but HTTPS for user access.
+The input script `../sw/ltu_trigger.php` adds the data. Modify it as needed for your own requirements.
 
- 2. Modify './sw/conf/api_key.inc.php' as in comments (averything marked '*** SECRET ***' and at least set a 'secret' data directory 'S_DATA' and an own 'L_KEY')
+## Important
 
- 3. Set your Server name and path in the 'sys_param.lxp' file on the devices/loggers.
+This repository (`LTX_Legacy`) is automatically generated and maintained by scripts. No feedback to issues, requests, or comments.
 
- 4. Make a test transmission
- 
- 5. Log in to Legacy 'https://SERVER.XYZ/xxx/legacy/index.html'
- (Hint: for fast access bookmark it like this: https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY (YOURLKEY: your L_KEY from api_key.inc.php)
+## Installation
 
-_(Just as Info: In case of "LTX_Server" all new data will be written to the database. There is a quota limit in
-'./sw/conf/api_key.inc.php' ("DB_QUOTA" with default "90\n1000"). A file 'quota_days.dat' with 2-3 lines
-will automatically be written for each new logger, 1.st line are days (here 90), 2.nd line is lines (in the database, so even a small DB can hold thousands of devices).
-The optional 3.rd line is an URL where to send a PUSH notification on new data (only used for LTX_Server).
-The input script 'sw\ltu_trigger.php' will automatically remove older data.
-Change e.g. to "365\n100000" to allow only the last 365 days or max. 100000 lines per device.
-The file 'quota_days.dat' my be set to individual values per logger at any time.
+1. Copy all files to your server. The server must run HTTP, by default on port 80. It is recommended to make the server reachable by HTTP and HTTPS under the same name (see step 5).
 
-LTX Microcloud adapts maximum upload size for files with Autosync (e.g. logger data) to Network speed (2G/LTE-M is faster than LTE-NB). Set the 2 defines() for "MAXM_2GM"/"MAXM_NB". Default 20k/5k Bytes.
-For are transmission intervals at high logging intervals it should be increased to get always all data.
-Please note: using SSL encryption if slow connections are enabled (LTE-NB) might work, but is not recommended.
+   Data transfer via HTTP for devices/loggers uses much less energy than HTTPS. Devices can optionally use HTTPS on request. HTTP is recommended for communication between server and loggers; HTTPS is recommended for user access.
 
-New in V.23: By default all devices use the same D_API_KEY. This OK for small or closed systems. Optionally new devices can use individual keys (attached to MAC and checked via external API) for larger systems.
+2. Modify `./sw/conf/api_key.inc.php` as described in its comments. At minimum, change everything marked `*** SECRET ***`, set a secret data directory `S_DATA`, and define your own `L_KEY`.
 
-_(Only for generating device labels (and secure FOTA Updates) the AES-Factory-Key for the device via external 'KEY_SERVER_URL' is requred)_
+3. Set the server name and path in the `sys_param.lxp` file on the devices/loggers.
+
+4. Make a test transmission.
+
+5. Log in to Legacy at `https://SERVER.XYZ/xxx/legacy/index.html`.
+
+   Hint: for fast access, bookmark `https://SERVER.XYZ/xxx/legacy/index.php?k=YOURLKEY`, where `YOURLKEY` is your `L_KEY` from `api_key.inc.php`.
+
+## LTX_Server Notes
+
+In **LTX_Server** mode, all new data is written to the database. The quota limit is configured in `./sw/conf/api_key.inc.php` via `DB_QUOTA` (default: `"90\n1000"`). For each new logger, a `quota_days.dat` file with two or three lines is created automatically:
+
+1. Number of days to keep, for example `90`.
+2. Maximum number of database lines per device, for example `1000`.
+3. Optional URL for PUSH notifications on new data. This is used only by `LTX_Server`.
+
+The input script `sw/ltu_trigger.php` automatically removes older data. For example, set `DB_QUOTA` to `"365\n100000"` to keep only the last 365 days or a maximum of 100,000 lines per device. `quota_days.dat` can be changed per logger at any time.
+
+LTX Microcloud adapts the maximum upload size for files with Autosync, such as logger data, to the network speed. `2G/LTE-M` is faster than `LTE-NB`. Configure the two `define()` values `MAXM_2GM` and `MAXM_NB`; the defaults are `20k` and `5k` bytes.
+
+For rare transmission intervals with high logging intervals, increase these limits to ensure that all data is transferred. SSL encryption over slow connections such as `LTE-NB` might work, but is not recommended.
+
+New in V2.23: by default, all devices use the same `D_API_KEY`. This is acceptable for small or closed systems. Larger systems can optionally use individual keys, attached to the MAC and checked via an external API.
+
+Only for generating device labels and secure FOTA updates, the AES factory key for the device is required via external `KEY_SERVER_URL`.
 
 ---
 
-## 3.rd Party Software ##
-- PHP QR Code https://sourceforge.net/projects/phpqrcode License: LGPL
+## Third-party Software
+
+- PHP QR Code: <https://sourceforge.net/projects/phpqrcode> (LGPL)
 
 ---
 
-## Changelog ##
+## Changelog
+
 - V1.00 04.12.2020 Initial
-- V1.01 06.12.2020 Checked for PHP8 compatibility
-- V1.10 09.01.2021 More Docs added
-- V1.11 16.03.2022 More Docs added
-- V1.50 08.12.2022 SWARM Packet driver added
-- V1.52 20.01.2023 ASTOROCAST Packet driver added
-- V1.60 21.01.2023 Push-URL added 
-- V1.76 06.06.2023 Access Legacy for Admin Users
-- V1.77 28.06.2023 Added sw/js/xtract_demo.html: demo to access BLE_API data in IndexDB
-- V1.79 05.10.2023 Added CommandConfig as new Parameter in 'iparam.lxp'
-- V2.00 15.10.2023 Direct FTP/FTPSSL-Push via CommandConfig (only 'LTX_Server')
-- V2.01 18.10.2023 Cosmetics and FTP-push (only 'LTX_Server')
-- V2.10 19.10.2023 Decoding of compressed lines (starting with '$'+Base64) added
-- V2.20	02.11.2023 Legacy CSView UTF-8 cosmetics
-- V2.21	04.11.2023 Added Network Details (2G/4G/..) 
-- V2.22 05.11.2023 Max. upload limit depending on Network, set defines(MAXM_xx) in 'api_key.inc.php!
-- V2.23 25.11.2023 If DAPIKEY_SERVER defined: indivdual external D_API_KEY check for each NEW device  (only once)
+- V1.01 06.12.2020 Checked for PHP 8 compatibility
+- V1.10 09.01.2021 More docs added
+- V1.11 16.03.2022 More docs added
+- V1.50 08.12.2022 SWARM packet driver added
+- V1.52 20.01.2023 ASTROCAST packet driver added
+- V1.60 21.01.2023 Push URL added
+- V1.76 06.06.2023 Access Legacy for admin users
+- V1.77 28.06.2023 Added `sw/js/xtract_demo.html`: demo to access BLE_API data in IndexDB
+- V1.79 05.10.2023 Added `CommandConfig` as new parameter in `iparam.lxp`
+- V2.00 15.10.2023 Direct FTP/FTPSSL push via `CommandConfig` (only `LTX_Server`)
+- V2.01 18.10.2023 Cosmetics and FTP push (only `LTX_Server`)
+- V2.10 19.10.2023 Decoding of compressed lines, starting with `$` + Base64, added
+- V2.20 02.11.2023 Legacy CSView UTF-8 cosmetics
+- V2.21 04.11.2023 Added network details (2G/4G/...)
+- V2.22 05.11.2023 Max. upload limit depending on network; set `MAXM_xx` in `api_key.inc.php`
+- V2.23 25.11.2023 If `DAPIKEY_SERVER` is defined: individual external `D_API_KEY` check for each new device (only once)
 - V2.31 13.05.2024 Drivers for SWARM (product shut down) and ASTROCAST removed
-- V2.32 24.05.2024 Added drivers form ORBCOMM IGWS2 (INMARSAT)
-- V2.53 25.06.2025 Added LoRaWAN support for ChirpStack V4 and TTN V3 ('lxu_ltxlora_v1.php')
-
-
+- V2.32 24.05.2024 Added drivers from ORBCOMM IGWS2 (INMARSAT)
+- V2.53 25.06.2025 Added LoRaWAN support for ChirpStack V4 and TTN V3 (`lxu_ltxlora_v1.php`)
