@@ -21,7 +21,7 @@ Das Spiegeln des JES-FS (Dateisystem der IoT-Logger) auf den Server schafft eine
 
 `sw/lxu_v1.php` ist der zentrale HTTP-Endpunkt für den Datenaustausch zwischen LTrax-Loggern und Server. Das Skript:
 
-- authentifiziert Gerät + API-Key,
+- authentifiziert Gerät und API-Key,
 - parst ein binäres Multi-Command-Protokoll mit CRC pro Block,
 - schreibt Spiegel-/Statusdaten in den Gerätebaum unter `S_DATA/<MAC>/...`,
 - generiert im gleichen Request serverseitige Antworten (Kommandoblöcke),
@@ -60,9 +60,9 @@ Initial für neue Geräte werden standardmäßig Requests angelegt (`cmd/getdir.
 Jeder Block ist aufgebaut als:
 
 - `CMD` (1 Byte)
-- `LEN` (4 Byte, Big Endian)
+- `LEN` (4 Byte, Big-Endian)
 - `PAYLOAD` (`LEN` Bytes)
-- `CRC32` (4 Byte, Big Endian)
+- `CRC32` (4 Byte, Big-Endian)
 
 CRC-Bildung im Skript: `~crc32(CMD+LEN+PAYLOAD) & 0xFFFFFFFF`.
 
@@ -123,7 +123,7 @@ Damit wird ein alter Verzeichniszustand invalidiert und sauber neu aufgebaut.
 
 Für jede Datei sendet das Device Flags, Länge, CRC, Datum, Dateiname.
 
-Serveraktion:
+Serveraktionen:
 
 1. `.vmeta` schreiben (`vd_flags`, `vd_len`, `vd_crc`, `vd_date`, `vd_dir`).
 2. Bei Sync-Flag (`fflags & 64`) wird entschieden, ob Daten angefordert werden müssen:
@@ -138,9 +138,9 @@ Ergebnis: CDIRENTRY ist der eigentliche „Soll-Ist-Abgleich“ zwischen JES-FS 
 
 Transportiert Dateidaten inklusive Offset (`pos0`) und Dateizeit.
 
-Serveraktion:
+Serveraktionen:
 
-- schreibt/appendet in `files/<fname>` (bei Neuschreiben vorher `.bak`),
+- schreibt in `files/<fname>` oder hängt dort an (bei Neuschreiben vorher `.bak`),
 - erkennt Gaps, Duplikate, Overlaps und protokolliert diese,
 - aktualisiert `.fmeta` (`flags`, `len`, `date`, optional `pos0`),
 - löscht ggf. offene `get/<fname>`-Anforderung,
@@ -239,10 +239,10 @@ Priorität: `server.cmd` > Firmware > `getdir` > `get` > `del` > `put` > `usercm
 
 ## 9. Bekannte Besonderheiten aus dem Code
 
-- Dateiname mit `.php` wird serverseitig zu `<name>.php_` umgebogen (Sicherheitsmaßnahme).
+- Dateinamen mit `.php` werden serverseitig zu `<name>.php_` umgebogen (Sicherheitsmaßnahme).
 - Bei kleiner Antwort ohne offene Folgeaktion sendet der Server mindestens `C2` (Serverzeit).
 - Optionaler Quectel-Workaround: zusätzlicher Dummy-Text bei Firmwaretransfer.
-- Trigger-Aufruf erfolgt per CURL kurz angebunden (Timeouts), Fehler werden geloggt.
+- Der Trigger-Aufruf erfolgt per cURL mit kurzen Timeouts; Fehler werden geloggt.
 
 ---
 
