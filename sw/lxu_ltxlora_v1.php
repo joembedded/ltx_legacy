@@ -28,7 +28,7 @@
  *   (Data as JSON in the HTTP body)
  * For Tests server.abc/ltx/sw/lxu_ltxlora_v1.php?KEY=xxxx&test=fname
  *
- * V1.09 - 12.11.2025 (C) JoEmbedded.de
+ * V1.10 - 04.07.2026 (C) JoEmbedded.de
  */
 
 error_reporting(E_ALL);
@@ -243,7 +243,10 @@ try {
 				$snr = $rxs['snr'] ?? '(?)'; // Missing SNR sometimes happen
 			}
 		}
-		if ($fcnt < 0 || $rssi == -199 || $snr == -199) $paylog = true;
+		if ($fcnt < 0 || $rssi == -199 || $snr == -199) {
+			$paylog = true;
+			$xlog .= "(PAYLOG: Invalid RXInfo: fCnt:$fcnt, RSSI:$rssi, SNR:$snr)";
+		}
 	}
 
 	// Working variables
@@ -294,7 +297,6 @@ try {
 				$i += 13;
 			}
 		}
-
 		// Generate data line (and units)
 		$line = "!$unix_ts";
 		$units = "!U";
@@ -316,9 +318,9 @@ try {
 				$unit = str_replace(' ', '', $unit); // No whitespace allowed
 				$units .= " $idx:$unit";
 				if (!isset($known_units[$idx]) && $idx < 90) { // LoRa-Unit, but nothing in param
-					$known_units[$idx] = $unit;
+				$known_units[$idx] = $unit;
 					$wiparam = true;
-				}
+					}
 			} else if (isset($known_units[$idx])) { // Unit from iparam, but not LoRa
 				$unit = $known_units[$idx];
 				$units .= " $idx:$unit";
@@ -327,7 +329,8 @@ try {
 		// Add HKs always available: 
 		$frel = $fcnt - $devi['dpack0']; // Relative packet this day
 		if ($frel < 0) {
-			$paylog = true;
+			$paylog = true; // Packet older than last? Phasing?
+			$xlog .= "(PAYLOG: fCnt:$fcnt < dpack0:" . $devi['dpack0'] . ")";			
 		}
 		$rpack = $frel;
 		$line .= " 100:$rpack 102:$rssi 103:$snr";
@@ -346,7 +349,6 @@ try {
 			$devi['cookie'] = $cookie;
 			array_unshift($edtdata, $units . "\n");
 			array_unshift($edtdata, "<COOKIE $cookie ($timestr)>\n");
-
 			$iparam[4] = $now;
 			for ($i = 0; $i <= $highestchan; $i++) {
 				$bidx = $idxkan0 + $i * 14;
@@ -355,7 +357,9 @@ try {
 				if (!isset($iparam[$bidx + 2])) $iparam[$bidx + 2] = '0'; //Physkan
 				if (!isset($iparam[$bidx + 3])) $iparam[$bidx + 3] = ''; //Propsm (unused)
 				if (!isset($iparam[$bidx + 4])) $iparam[$bidx + 4] = '0'; // Srcidx
-				if (!isset($iparam[$bidx + 5])) $iparam[$bidx + 5] = @$known_units[$i]; // unit
+				if ((!isset($iparam[$bidx + 5]) || $iparam[$bidx + 5] === '') && isset($known_units[$i]) && $known_units[$i] !== '') {
+					$iparam[$bidx + 5] = $known_units[$i]; // unit
+				}
 				if (!isset($iparam[$bidx + 6])) $iparam[$bidx + 6] = '0'; //Digits
 				if (!isset($iparam[$bidx + 7])) $iparam[$bidx + 7] = '0';
 				if (!isset($iparam[$bidx + 8])) $iparam[$bidx + 8] = '0.0';
@@ -366,6 +370,7 @@ try {
 				if (!isset($iparam[$bidx + 13])) $iparam[$bidx + 13] = ''; // xbytes
 			}
 			file_put_contents("$dpath/files/iparam.lxp", implode("\n", $iparam) . "\n");
+
 		}
 		$ltxreason = $object['reason']; // Only show manual transmissions explicitly
 		if (strpos($ltxreason, '(Manual)') !== false) {
@@ -389,6 +394,7 @@ try {
 		} else {
 			$edtdata = array("<UNKNOWN Port/Cnt:$fport/$fcnt ($timestr)>\n"); // Bsp: via fPort 0: Time, ...
 			$paylog = true;
+			$xlog .= "(PAYLOG: No Payload, Port:$fport, fCnt:$fcnt)";			
 		}
 	}
 	// ----- LTX Payload END -----
@@ -402,8 +408,8 @@ try {
 		file_put_contents("$dpath/in_new/" . $ftemp, $edtdata);
 		add_data($edtdata);
 	} else { // e.g. MIC commands or battery level or ..
-		$xlog .= "(Payload ignored)";
 		$paylog = true; // but log it (DBG)
+		$xlog .= "(PAYLOG: Ignored Payload)";
 	}
 
 	$mtrun = round((microtime(true) - $mtmain_t0) * 1000, 4);
