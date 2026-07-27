@@ -28,7 +28,7 @@
  *   (Data as JSON in the HTTP body)
  * For Tests server.abc/ltx/sw/lxu_ltxlora_v1.php?KEY=xxxx&test=fname
  *
- * V1.10 - 04.07.2026 (C) JoEmbedded.de
+ * V1.11 - 27.07.2026 (C) JoEmbedded.de
  */
 
 error_reporting(E_ALL);
@@ -250,7 +250,10 @@ try {
 	}
 
 	// Working variables
-	$maxlen = strlen(base64_decode($data['data'] ?? 0)); // Uploaded data payload
+	// ChirpStack uses 'data', TTN uses 'uplink_message.frm_payload' (both Base64)
+	$raw_payload_b64 = $data['data'] ?? $data['uplink_message']['frm_payload'] ?? null;
+	$raw_payload_bin = ($raw_payload_b64 !== null) ? base64_decode($raw_payload_b64, true) : false;
+	$maxlen = ($raw_payload_bin === false) ? 0 : strlen($raw_payload_bin); // Uploaded data payload bytes
 	$devi = read_ini("$dpath/device_info.dat");
 	$devi['now'] = $now;
 	$devi['pasync'] = '1';    // LORA may be asynchronous (and no disconnect)
@@ -303,7 +306,8 @@ try {
 		$reason = 2;  // Assume AUTO
 
 		// Add chans from LTX payload
-		$ochana = $object['chans'];
+		$ochana = $object['chans'] ?? [];
+		if (!is_array($ochana)) $ochana = [];
 		$highestchan = 0;
 		foreach ($ochana as $chan) {
 			$idx = intval($chan['channel']);	// Chirpstack sends Float? Channel index
@@ -372,12 +376,12 @@ try {
 			file_put_contents("$dpath/files/iparam.lxp", implode("\n", $iparam) . "\n");
 
 		}
-		$ltxreason = $object['reason']; // Only show manual transmissions explicitly
+		$ltxreason = $object['reason'] ?? ''; // Only show manual transmissions explicitly
 		if (strpos($ltxreason, '(Manual)') !== false) {
 			array_unshift($edtdata, "<NT MANUAL ($timestr)>\n");
 			$reason = 3; // Manual
 		}
-		$ltxflags = $object['flags'];	// Only check (Reset), ignore rest
+		$ltxflags = $object['flags'] ?? '';	// Only check (Reset), ignore rest
 		if (strpos($ltxflags, '(Reset)') !== false) {
 			array_unshift($edtdata, "<RESET ($timestr)>\n");
 		}
