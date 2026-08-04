@@ -8,8 +8,8 @@ include("../sw/conf/api_key.inc.php");
 include("../sw/lxu_loglib.php");
 session_start();
 if (isset($_REQUEST['k'])) {
-	$api_key = $_REQUEST['k'];
-	$_SESSION['key'] = L_KEY;
+	$api_key = is_string($_REQUEST['k']) ? $_REQUEST['k'] : '';
+	if (hash_equals(L_KEY, $api_key)) $_SESSION['key'] = L_KEY;
 } else $api_key = @$_SESSION['key'];
 if (!strcmp($api_key, L_KEY)) {
 	$dev = 1;	// Dev-Funktionen anzeigen

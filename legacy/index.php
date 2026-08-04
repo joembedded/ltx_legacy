@@ -9,8 +9,8 @@ include("mcclist.inc.php");
 session_start();
 if (isset($_REQUEST['k'])) {
 	sleep(1);
-	$api_key = $_REQUEST['k'];
-	$_SESSION['key'] = L_KEY;
+	$api_key = is_string($_REQUEST['k']) ? $_REQUEST['k'] : '';
+	if (hash_equals(L_KEY, $api_key)) $_SESSION['key'] = L_KEY;
 } else {
 	$api_key = @$_SESSION['key'];
 }
